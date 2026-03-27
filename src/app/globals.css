@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-tertiary: #efefef;
+  --color-bg-quaternary: #e9e9f5;
+  --color-border-primary: #e9e9f5;
+  --color-border-secondary: #bcc4d3;
+  --color-text-body: #3d3d5c;
+  --color-text-description: #777b90;
+  --color-text-on-fill: #ffffff;
+  --color-icon-body: #3d3d5c;
+  --color-bg-secondary: #f5f5fa;
+  --color-border-accent: #e8c766;
+  --color-brand-primary: #3d3d5c;
+
+  /* Font sizes */
+  --font-size-caption: 12px;
+  --font-size-body: 14px;
+  --font-size-h4: 21px;
+
+  /* Radius */
+  --radius-xs: 4px;
+}
+
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 500;
+  src: url("https://fonts.gstatic.com/s/zenkakugothicnew/v15/gNMVW2drQpDw0GjzrVNFf_valaDBcznOqpdKaWTSTGlMyd8.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 700;
+  src: url("https://fonts.gstatic.com/s/zenkakugothicnew/v15/gNMVW2drQpDw0GjzrVNFf_valaDBcznOqs9MaWTSTGlMyd8.woff2")
+    format("woff2");
+}
+
+body {
+  font-family: "Zen Kaku Gothic New", sans-serif;
+}
