@@ -50,7 +50,7 @@ export default function ReservePage() {
       </div>
 
       {/* Content */}
-      {mode === "consultation" && <ConsultationList />}
+      {mode === "consultation" && <ConsultationList onNavigateToMentors={() => { setMode("mentor"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
       {mode === "topic" && <TopicList />}
       {mode === "mentor" && <MentorList />}
     </div>

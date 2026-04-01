@@ -230,7 +230,7 @@ function PastConsultationCard({ consultation }: { consultation: PastConsultation
           <span className="text-[10px] text-text-description">{consultation.date}</span>
         </div>
         <a
-          href={`/1on1/mentor/${consultation.mentorId}`}
+          href="/1on1/mentor/demo"
           className="text-xs font-bold text-brand-primary hover:underline shrink-0"
         >
           同じ悩みで相談する →
@@ -248,6 +248,7 @@ function useFilteredMentors(
   selectedCategory: string | null,
   selectedTech: Set<string>,
   selectedTrend: string | null,
+  showAll: boolean,
 ): { displayed: typeof mentors; totalCount: number } {
   return useMemo(() => {
     const sortByAvailability = (list: typeof mentors) =>
@@ -256,19 +257,22 @@ function useFilteredMentors(
         return order[a.availability] - order[b.availability];
       });
 
+    const limit = (list: typeof mentors) =>
+      showAll ? list : list.slice(0, DISPLAY_COUNT);
+
     // トレンドトピックが選択されている場合
     if (selectedTrend) {
       const trend = trendingTopics.find((t) => t.label === selectedTrend);
       if (!trend) return { displayed: [], totalCount: 0 };
       if (trend.matchSkills.length === 0) {
         const all = mentors.filter((m) => m.availability !== "full");
-        return { displayed: all.slice(0, DISPLAY_COUNT), totalCount: all.length };
+        return { displayed: limit(all), totalCount: all.length };
       }
       const skillSet = new Set(trend.matchSkills.map((s) => s.toLowerCase()));
       const matched = sortByAvailability(
         mentors.filter((m) => m.skills.some((s) => skillSet.has(s.toLowerCase())))
       );
-      return { displayed: matched.slice(0, DISPLAY_COUNT), totalCount: matched.length };
+      return { displayed: limit(matched), totalCount: matched.length };
     }
 
     // カテゴリから relatedTech を取得
@@ -285,14 +289,14 @@ function useFilteredMentors(
 
     if (allTech.size === 0) {
       const all = mentors.filter((m) => m.availability !== "full");
-      return { displayed: all.slice(0, DISPLAY_COUNT), totalCount: all.length };
+      return { displayed: limit(all), totalCount: all.length };
     }
 
     const matched = sortByAvailability(
       mentors.filter((m) => m.skills.some((s) => allTech.has(s.toLowerCase())))
     );
-    return { displayed: matched.slice(0, DISPLAY_COUNT), totalCount: matched.length };
-  }, [selectedCategory, selectedTech, selectedTrend]);
+    return { displayed: limit(matched), totalCount: matched.length };
+  }, [selectedCategory, selectedTech, selectedTrend, showAll]);
 }
 
 // ── タブ切り替え ──
@@ -326,18 +330,20 @@ function TabToggle({ tab, onChange }: { tab: ConsultationTab; onChange: (t: Cons
 
 // ── メインコンポーネント ──
 
-export default function ConsultationList() {
+export default function ConsultationList({ onNavigateToMentors }: { onNavigateToMentors?: () => void }) {
   const [activeTab, setActiveTab] = useState<ConsultationTab>("find");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProblems, setSelectedProblems] = useState<Set<string>>(new Set());
   const [selectedTech, setSelectedTech] = useState<Set<string>>(new Set());
   const [selectedTrend, setSelectedTrend] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [showAllMentors, setShowAllMentors] = useState(false);
   const [visibleConsultations, setVisibleConsultations] = useState(4);
 
   const toggleCategory = (id: string) => {
     setSelectedCategory((prev) => (prev === id ? null : id));
     setSelectedTrend(null); // カテゴリ選択でトレンド解除
+    setShowAllMentors(false);
   };
   const toggleProblem = (id: string) => {
     setSelectedProblems((prev) => {
@@ -360,10 +366,11 @@ export default function ConsultationList() {
     setSelectedProblems(new Set());
     setSelectedTech(new Set());
     setSelectedTrend(null);
+    setShowAllMentors(false);
   };
 
   const hasActiveFilters = !!selectedCategory || selectedProblems.size > 0 || selectedTech.size > 0 || !!selectedTrend;
-  const { displayed: filteredMentors, totalCount: totalMentorCount } = useFilteredMentors(selectedCategory, selectedTech, selectedTrend);
+  const { displayed: filteredMentors, totalCount: totalMentorCount } = useFilteredMentors(selectedCategory, selectedTech, selectedTrend, showAllMentors);
 
   // 相談事例のフィルタリング
   const filteredConsultations = hasActiveFilters
@@ -427,6 +434,7 @@ export default function ConsultationList() {
                 onClick={() => {
                   setSelectedTrend(selectedTrend === topic.label ? null : topic.label);
                   setSelectedCategory(null); // トレンド選択でカテゴリ解除
+                  setShowAllMentors(false);
                 }}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
                   selectedTrend === topic.label
@@ -537,17 +545,30 @@ export default function ConsultationList() {
                 <MentorCard key={mentor.name} {...mentor} />
               ))}
             </div>
-            {totalMentorCount > DISPLAY_COUNT && (
+            {!showAllMentors && totalMentorCount > DISPLAY_COUNT && (
               <div className="mt-4 text-center">
-                <span className="text-sm text-text-description">
-                  他 <span className="font-bold text-brand-primary">{totalMentorCount - DISPLAY_COUNT}名</span> も対応可能
-                </span>
-                <span className="text-text-description mx-2">·</span>
-                <a href="/1on1/mentors" className="text-sm font-bold text-brand-primary hover:underline">
-                  すべてのメンターを見る →
-                </a>
+                <button
+                  type="button"
+                  onClick={() => setShowAllMentors(true)}
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-primary hover:underline cursor-pointer"
+                >
+                  <span>対応可能なメンターをもっと見る（他{totalMentorCount - DISPLAY_COUNT}名）</span>
+                  <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="mt-px">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
               </div>
             )}
+            {/* すべてのメンターを見る（タブ遷移） */}
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={onNavigateToMentors}
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold text-brand-primary bg-brand-primary/5 border border-brand-primary/20 rounded-lg hover:bg-brand-primary/10 cursor-pointer transition-colors"
+              >
+                160名以上のメンターからもっと探してみる 🔍
+              </button>
+            </div>
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-10 border border-dashed border-border-primary rounded-xl text-center">

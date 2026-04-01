@@ -66,7 +66,7 @@ export default function MentorCard({
   const avail = availabilityConfig[availability];
   return (
     <a
-      href="#"
+      href="/1on1/mentor/demo"
       className="block p-4 rounded-lg border border-border-primary hover:border-brand-primary hover:bg-bg-secondary transition-colors cursor-pointer"
     >
       {/* Top: Avatar + Name + Availability */}

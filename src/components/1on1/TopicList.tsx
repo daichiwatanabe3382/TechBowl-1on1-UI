@@ -324,7 +324,7 @@ function TopicCard({ content }: { content: TopicContent }) {
     <div className="group flex flex-col bg-white border border-border-primary rounded-xl overflow-hidden hover:border-brand-primary transition-colors text-left">
       {/* Card body — links to topic detail */}
       <a
-        href={`/1on1/topic/${content.id}`}
+        href="/1on1/mentor/demo"
         className="flex flex-col flex-1 cursor-pointer"
       >
         {/* Thumbnail */}
@@ -378,7 +378,7 @@ function TopicCard({ content }: { content: TopicContent }) {
 
       {/* Mentor CTA - primary action to mentor detail */}
       <a
-        href={`/1on1/mentor/${content.id}`}
+        href="/1on1/mentor/demo"
         className="flex flex-col gap-2 mt-auto border-t border-border-primary px-3 py-2.5 rounded-b-xl transition-colors hover:bg-brand-primary/5 group/mentor"
       >
         <div className="flex items-center gap-2">
@@ -439,7 +439,7 @@ function TimelineCard({ content }: { content: TopicContent }) {
   return (
     <div className="bg-white border border-border-primary rounded-xl overflow-hidden hover:border-brand-primary transition-colors">
       <a
-        href={`/1on1/topic/${content.id}`}
+        href="/1on1/mentor/demo"
         className="flex gap-5 p-4 cursor-pointer"
       >
         {/* Thumbnail — 16:9 */}
@@ -499,7 +499,7 @@ function TimelineCard({ content }: { content: TopicContent }) {
       </a>
       {/* Mentor CTA - links to mentor detail */}
       <a
-        href={`/1on1/mentor/${content.id}`}
+        href="/1on1/mentor/demo"
         className="flex items-center gap-3 px-4 py-2.5 border-t border-border-primary hover:bg-brand-primary/5 transition-colors group/mentor"
       >
         <div className="w-9 h-9 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">
