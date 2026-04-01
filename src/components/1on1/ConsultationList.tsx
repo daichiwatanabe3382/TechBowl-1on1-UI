@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import { ReactNode, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
+import MentorCard from "./MentorCard";
+import { mentors } from "./MentorList";
 import {
   SmartphoneIcon,
   PaletteIcon,
@@ -20,86 +21,26 @@ import {
   CompassIcon,
   LifebuoyIcon,
   ChatSmileIcon,
-  ArrowRightIcon,
 } from "@/components/icons";
 
-// ── カテゴリと課題・技術の関連マッピング ──
+// ── データ定義 ──
 
 type ConsultationCategory = {
   id: string;
   icon: ReactNode;
   title: string;
-  description: string;
-  examples: string[];
-  mentorCount: number;
-  relatedProblems: string[]; // problemCategories の id
-  relatedTech: string[]; // techFields の id
+  relatedTech: string[];
 };
 
 const categories: ConsultationCategory[] = [
-  {
-    id: "code-review",
-    icon: <SearchIcon size={20} />,
-    title: "コードレビューしてほしい",
-    description: "書いたコードを見てもらい、改善点やベストプラクティスを教えてもらう",
-    examples: ["このPR見てほしい", "リファクタリングのアドバイスが欲しい", "設計の妥当性を確認したい"],
-    mentorCount: 82,
-    relatedProblems: ["performance", "testing", "code-review"],
-    relatedTech: ["javascript", "typescript", "react", "nextjs", "vue", "nodejs", "python", "go"],
-  },
-  {
-    id: "career",
-    icon: <RocketIcon size={20} />,
-    title: "転職・キャリアの相談",
-    description: "キャリアパスや転職活動について現役エンジニアの視点でアドバイス",
-    examples: ["今の会社を続けるべきか", "年収交渉のコツ", "スキルアップの方向性"],
-    mentorCount: 64,
-    relatedProblems: ["team-dev"],
-    relatedTech: [],
-  },
-  {
-    id: "tech-selection",
-    icon: <ScalesIcon size={20} />,
-    title: "技術選定で迷っている",
-    description: "フレームワークやライブラリの選定、アーキテクチャの判断を一緒に考える",
-    examples: ["Next.js vs Remix", "状態管理どうすべき？", "DB選定のポイント"],
-    mentorCount: 58,
-    relatedProblems: ["design-system", "database", "ci-cd"],
-    relatedTech: ["react", "nextjs", "vue", "nodejs", "python", "go", "rust", "aws", "docker"],
-  },
-  {
-    id: "design-review",
-    icon: <CompassIcon size={20} />,
-    title: "設計の壁打ちをしたい",
-    description: "システム設計やDB設計について、経験者の視点でレビュー・アドバイス",
-    examples: ["このER図どう思う？", "マイクロサービス化すべき？", "APIの設計方針"],
-    mentorCount: 45,
-    relatedProblems: ["database", "design-system", "security"],
-    relatedTech: ["typescript", "nodejs", "python", "go", "aws", "docker"],
-  },
-  {
-    id: "stuck",
-    icon: <LifebuoyIcon size={20} />,
-    title: "業務で詰まっている",
-    description: "エラーが解決できない、実装方法がわからないなど、具体的な課題を一緒に解決",
-    examples: ["このエラーが解消できない", "パフォーマンス改善したい", "テストの書き方"],
-    mentorCount: 96,
-    relatedProblems: ["performance", "testing", "security", "ci-cd", "app-release"],
-    relatedTech: ["javascript", "typescript", "react", "nextjs", "vue", "nodejs", "python", "go", "swift", "kotlin", "flutter"],
-  },
-  {
-    id: "casual",
-    icon: <ChatSmileIcon size={20} />,
-    title: "なんとなく話を聞いてほしい",
-    description: "明確な課題がなくてもOK。雑談ベースでエンジニアの先輩と話してみる",
-    examples: ["エンジニアの働き方って？", "勉強のモチベーション", "業界の雰囲気を知りたい"],
-    mentorCount: 120,
-    relatedProblems: ["oss", "team-dev"],
-    relatedTech: [],
-  },
+  { id: "code-review", icon: <SearchIcon size={14} />, title: "コードレビューしてほしい", relatedTech: ["javascript", "typescript", "react", "nextjs", "vue", "nodejs", "python", "go"] },
+  { id: "career", icon: <RocketIcon size={14} />, title: "転職・キャリアの相談", relatedTech: [] },
+  { id: "tech-selection", icon: <ScalesIcon size={14} />, title: "技術選定で迷っている", relatedTech: ["react", "nextjs", "vue", "nodejs", "python", "go", "rust", "aws", "docker"] },
+  { id: "design-review", icon: <CompassIcon size={14} />, title: "設計の壁打ちをしたい", relatedTech: ["typescript", "nodejs", "python", "go", "aws", "docker"] },
+  { id: "stuck", icon: <LifebuoyIcon size={14} />, title: "業務で詰まっている", relatedTech: ["javascript", "typescript", "react", "nextjs", "vue", "nodejs", "python", "go", "swift", "kotlin", "flutter"] },
+  { id: "casual", icon: <ChatSmileIcon size={14} />, title: "なんとなく話を聞いてほしい", relatedTech: [] },
 ];
 
-// 技術分野
 const techFields = [
   { id: "html", label: "HTML" },
   { id: "css", label: "CSS" },
@@ -119,7 +60,6 @@ const techFields = [
   { id: "docker", label: "Docker" },
 ];
 
-// 解決したい課題別
 const problemCategories: { id: string; label: string; icon: ReactNode }[] = [
   { id: "app-release", label: "iOS/Androidアプリのリリース", icon: <SmartphoneIcon size={14} /> },
   { id: "design-system", label: "デザインシステム構築", icon: <PaletteIcon size={14} /> },
@@ -135,356 +75,251 @@ const problemCategories: { id: string; label: string; icon: ReactNode }[] = [
   { id: "oss", label: "OSS貢献の始め方", icon: <StarIcon size={14} /> },
 ];
 
-// 相談事例（カテゴリIDで紐付け）
+// トレンドトピック（話のきっかけ）
+const trendingTopics: { emoji: string; label: string; matchSkills: string[] }[] = [
+  { emoji: "🤖", label: "Claude Code の使いこなし", matchSkills: ["python", "typescript", "go"] },
+  { emoji: "⚡", label: "AI時代のキャリア戦略", matchSkills: [] },
+  { emoji: "🚀", label: "React 19 / Next.js 15", matchSkills: ["react", "next.js", "typescript"] },
+  { emoji: "📱", label: "個人開発で収益化", matchSkills: ["flutter", "swift", "react native", "firebase"] },
+  { emoji: "🏗️", label: "モノリスからの脱却", matchSkills: ["go", "grpc", "kubernetes", "docker", "ddd", "マイクロサービス"] },
+  { emoji: "🔐", label: "認証・認可の設計", matchSkills: ["aws", "node.js", "typescript", "セキュリティ"] },
+  { emoji: "☁️", label: "AWS コスト最適化", matchSkills: ["aws", "terraform", "docker", "kubernetes"] },
+  { emoji: "📝", label: "技術ブログの始め方", matchSkills: [] },
+];
+
+// 相談事例（Before/After形式）
 type PastConsultation = {
   id: string;
-  title: string;
+  before: string;
+  after: string;
+  caption: string;
   categoryLabel: string;
   categoryId: string;
   mentorName: string;
   mentorAvatar: string;
+  mentorId: string;
   date: string;
 };
 
 const pastConsultations: PastConsultation[] = [
   {
     id: "1",
-    title: "Reactのパフォーマンス改善について相談しました",
+    before: "一覧画面の描画が遅くて原因がわからない",
+    after: "再レンダリングの原因を特定し、体感できるレベルで高速化",
+    caption: "useMemoやコンポーネント分割のコツも教わり、自分では気づけなかった視点をもらえました",
     categoryLabel: "コードレビュー",
     categoryId: "code-review",
-    mentorName: "池内 孝啓",
-    mentorAvatar: "/image/home/puru-image.png",
+    mentorName: "スー",
+    mentorAvatar: "https://techbowl.s3.ap-northeast-1.amazonaws.com/mentor-profile-image/ac10e6800b649ae3b024fe07ab2ce787.jpg",
+    mentorId: "sue",
     date: "2026.03.20",
   },
   {
     id: "2",
-    title: "SIerからWeb系への転職について話を聞いてもらいました",
+    before: "SIerからWeb系に転職したいけど何から始めれば…",
+    after: "評価されるスキルが明確になり、行動計画が立てられた",
+    caption: "現場目線でどんなスキルが評価されるか具体的に教えてもらい、ポートフォリオの方向性も決まりました",
     categoryLabel: "キャリア相談",
     categoryId: "career",
-    mentorName: "星川 佳瑠",
-    mentorAvatar: "/image/home/riku-image.png",
+    mentorName: "武田 憲太郎",
+    mentorAvatar: "https://techbowl.s3.ap-northeast-1.amazonaws.com/mentor-profile-image/7e6f7810e6282307454bfe3168f4744f.jpg",
+    mentorId: "takeda",
     date: "2026.03.18",
   },
   {
     id: "3",
-    title: "GraphQLを導入すべきか一緒に考えてもらいました",
+    before: "REST APIのエンドポイントが増えすぎて辛い",
+    after: "GraphQL段階的移行のロードマップが描けた",
+    caption: "チームの規模感に合わせてメリット・デメリットを整理してもらい、判断に自信が持てました",
     categoryLabel: "技術選定",
     categoryId: "tech-selection",
-    mentorName: "中條 剛",
-    mentorAvatar: "/image/home/puru-image.png",
+    mentorName: "sho_yamane",
+    mentorAvatar: "https://techbowl.s3.ap-northeast-1.amazonaws.com/mentor-profile-image/0f1afe66ee296ae506ec20175f7fc365.jpg",
+    mentorId: "sho_yamane",
     date: "2026.03.15",
   },
   {
     id: "4",
-    title: "新卒1年目の不安を聞いてもらいました",
+    before: "新卒1年目、周りのペースについていけず焦っている",
+    after: "成長は人それぞれと気づき、今やるべきことが明確に",
+    caption: "温かく励ましてもらい、今の時期にやっておくといいことを教えてもらえました",
     categoryLabel: "カジュアル",
     categoryId: "casual",
-    mentorName: "山田 太郎",
-    mentorAvatar: "/image/home/riku-image.png",
+    mentorName: "ちゅーやん",
+    mentorAvatar: "https://techbowl.s3-ap-northeast-1.amazonaws.com/techbowl/DzjceQsAg9HShbr1706187471.jpg_1.jpg",
+    mentorId: "chuyan",
     date: "2026.03.12",
   },
   {
     id: "5",
-    title: "マイクロサービスの設計方針をレビューしてもらいました",
+    before: "モノリスを分割したいが、どこから手をつけるべきか迷う",
+    after: "境界の考え方を学び、最初に切り出すサービスが決まった",
+    caption: "境界づけられたコンテキストをベースに優先順位を整理してもらいました",
     categoryLabel: "設計壁打ち",
     categoryId: "design-review",
-    mentorName: "池内 孝啓",
-    mentorAvatar: "/image/home/puru-image.png",
+    mentorName: "西谷 圭介",
+    mentorAvatar: "https://techbowl.s3.ap-northeast-1.amazonaws.com/mentor-profile-image/b6be831e277c7a465ea73907b119d7e2.jpg",
+    mentorId: "nishitani",
     date: "2026.03.10",
   },
   {
     id: "6",
-    title: "Dockerが動かなくてずっと詰まってた問題を解決できた",
+    before: "Dockerのビルドが通らず、エラーの読み方もわからない",
+    after: "画面共有で一緒にデバッグし、原因を10分で特定",
+    caption: "環境変数の設定ミスをすぐ見つけてくれて、デバッグの進め方自体も学べました",
     categoryLabel: "業務で詰まっている",
     categoryId: "stuck",
-    mentorName: "星川 佳瑠",
-    mentorAvatar: "/image/home/riku-image.png",
+    mentorName: "keigo",
+    mentorAvatar: "https://techbowl.s3.ap-northeast-1.amazonaws.com/mentor-profile-image/1c28eb74d6e9a7c6edbbfcee6fcd8950.jpg",
+    mentorId: "keigo",
     date: "2026.03.08",
   },
 ];
 
-// ── コンポーネント ──
+// ── サブコンポーネント ──
 
-function CategoryCard({
-  category,
-  isSelected,
-  onToggle,
-}: {
-  category: ConsultationCategory;
-  isSelected: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className={`group flex flex-col bg-white rounded-xl p-4 transition-all cursor-pointer text-left border-2 ${
-        isSelected
-          ? "border-brand-primary shadow-md ring-1 ring-brand-primary/20"
-          : "border-border-primary hover:shadow-md hover:border-brand-primary"
-      }`}
-    >
-      <div className="flex items-start gap-3 mb-3">
-        <span
-          className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
-            isSelected
-              ? "bg-brand-primary text-white"
-              : "bg-bg-quaternary text-brand-primary"
-          }`}
-        >
-          {category.icon}
-        </span>
-        <div className="flex-1">
-          <h4 className="text-sm font-bold text-text-body mb-1">{category.title}</h4>
-          <p className="text-xs text-text-description leading-relaxed">{category.description}</p>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-1 mb-3">
-        {category.examples.map((example) => (
-          <span
-            key={example}
-            className="text-[10px] text-text-description bg-bg-secondary px-2 py-0.5 rounded-full"
-          >
-            {example}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-border-primary">
-        <span className="text-xs text-text-description">
-          対応可能メンター <span className="font-bold text-brand-primary">{category.mentorCount}名</span>
-        </span>
-        {isSelected ? (
-          <span className="text-xs font-bold text-brand-primary">
-            ✓ 選択中
-          </span>
-        ) : (
-          <span className="text-xs font-bold text-brand-primary group-hover:underline">
-            選ぶ →
-          </span>
-        )}
-      </div>
-    </button>
-  );
-}
-
-function FilterTagButton({
+function FilterTag({
   label,
   icon,
   isSelected,
-  isHighlighted,
   onToggle,
 }: {
   label: string;
   icon?: ReactNode;
   isSelected: boolean;
-  isHighlighted: boolean;
   onToggle: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onToggle}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all cursor-pointer border ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
         isSelected
           ? "bg-brand-primary text-white border-brand-primary"
-          : isHighlighted
-          ? "bg-bg-quaternary text-text-body border-brand-primary font-medium"
           : "bg-white text-text-body border-border-primary hover:bg-bg-quaternary hover:border-brand-primary"
       }`}
     >
       {icon && <span className={isSelected ? "text-white" : "text-text-description"}>{icon}</span>}
-      {!icon && (
-        <span
-          className={`w-2 h-2 rounded-full ${
-            isSelected ? "bg-white" : "bg-brand-primary"
-          }`}
-        />
-      )}
       <span>{label}</span>
     </button>
   );
 }
 
-function CollapsibleSection({
-  title,
-  isOpen,
-  onToggle,
-  count,
-  children,
-}: {
-  title: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  count?: number;
-  children: ReactNode;
-}) {
-  return (
-    <div className="border border-border-primary rounded-xl overflow-hidden">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex items-center justify-between w-full px-4 py-3 bg-white hover:bg-bg-secondary transition-colors cursor-pointer"
-      >
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold text-text-body">{title}</h3>
-          {count !== undefined && count > 0 && (
-            <span className="text-[10px] font-bold text-white bg-brand-primary px-1.5 py-0.5 rounded-full">
-              {count}
-            </span>
-          )}
-        </div>
-        <svg
-          width={16}
-          height={16}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          className={`text-text-description transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-      </button>
-      <div
-        className={`transition-all duration-200 ease-in-out overflow-hidden ${
-          isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="px-4 pb-4 pt-1">{children}</div>
-      </div>
-    </div>
-  );
-}
-
 function PastConsultationCard({ consultation }: { consultation: PastConsultation }) {
   return (
-    <button
-      type="button"
-      className="flex items-center gap-3 bg-white border border-border-primary rounded-lg p-3 hover:bg-bg-secondary transition-colors cursor-pointer text-left w-full"
-    >
-      <div className="w-8 h-8 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">
-        <Image
-          src={consultation.mentorAvatar}
-          alt={consultation.mentorName}
-          width={32}
-          height={32}
-          className="object-cover w-full h-full"
-        />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-text-body line-clamp-1">{consultation.title}</p>
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-[10px] text-brand-primary bg-bg-quaternary px-1.5 py-0.5 rounded">
-            {consultation.categoryLabel}
-          </span>
-          <span className="text-[10px] text-text-description">{consultation.mentorName}</span>
-          <span className="text-[10px] text-text-description">{consultation.date}</span>
+    <div className="bg-white border border-border-primary rounded-xl p-4 hover:border-brand-primary transition-colors">
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-start gap-2">
+          <span className="shrink-0 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full mt-0.5">悩み</span>
+          <p className="text-sm font-bold text-text-body">{consultation.before}</p>
+        </div>
+        <div className="ml-[13px] border-l-2 border-brand-primary h-2.5" />
+        <div className="flex items-start gap-2">
+          <span className="shrink-0 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full mt-0.5">結果</span>
+          <p className="text-sm font-bold text-brand-primary">{consultation.after}</p>
         </div>
       </div>
-      <span className="text-xs text-brand-primary shrink-0">同じ内容で相談 →</span>
-    </button>
-  );
-}
-
-function ActiveFilters({
-  selectedCategory,
-  selectedProblems,
-  selectedTech,
-  onClearCategory,
-  onClearProblem,
-  onClearTech,
-  onClearAll,
-}: {
-  selectedCategory: string | null;
-  selectedProblems: Set<string>;
-  selectedTech: Set<string>;
-  onClearCategory: () => void;
-  onClearProblem: (id: string) => void;
-  onClearTech: (id: string) => void;
-  onClearAll: () => void;
-}) {
-  const categoryObj = categories.find((c) => c.id === selectedCategory);
-  const hasAny = selectedCategory || selectedProblems.size > 0 || selectedTech.size > 0;
-  if (!hasAny) return null;
-
-  return (
-    <div className="flex items-center gap-2 flex-wrap bg-bg-secondary rounded-xl px-4 py-3">
-      <span className="text-xs font-bold text-text-description mr-1">絞り込み中:</span>
-
-      {categoryObj && (
-        <button
-          type="button"
-          onClick={onClearCategory}
-          className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-primary text-white text-xs font-medium rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+      <p className="text-xs text-text-description leading-relaxed mt-2.5 line-clamp-2">{consultation.caption}</p>
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-primary">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">
+            <img src={consultation.mentorAvatar} alt={consultation.mentorName} className="object-cover w-full h-full" />
+          </div>
+          <span className="text-xs font-medium text-text-body">{consultation.mentorName}</span>
+          <span className="text-[10px] text-brand-primary bg-bg-quaternary px-1.5 py-0.5 rounded">{consultation.categoryLabel}</span>
+          <span className="text-[10px] text-text-description">{consultation.date}</span>
+        </div>
+        <a
+          href={`/1on1/mentor/${consultation.mentorId}`}
+          className="text-xs font-bold text-brand-primary hover:underline shrink-0"
         >
-          {categoryObj.title}
-          <span className="text-white/70">×</span>
-        </button>
-      )}
-
-      {[...selectedProblems].map((id) => {
-        const p = problemCategories.find((x) => x.id === id);
-        if (!p) return null;
-        return (
-          <button
-            key={id}
-            type="button"
-            onClick={() => onClearProblem(id)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-primary text-white text-xs font-medium rounded-full cursor-pointer hover:opacity-80 transition-opacity"
-          >
-            {p.label}
-            <span className="text-white/70">×</span>
-          </button>
-        );
-      })}
-
-      {[...selectedTech].map((id) => {
-        const t = techFields.find((x) => x.id === id);
-        if (!t) return null;
-        return (
-          <button
-            key={id}
-            type="button"
-            onClick={() => onClearTech(id)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-primary text-white text-xs font-medium rounded-full cursor-pointer hover:opacity-80 transition-opacity"
-          >
-            {t.label}
-            <span className="text-white/70">×</span>
-          </button>
-        );
-      })}
-
-      <button
-        type="button"
-        onClick={onClearAll}
-        className="text-xs text-text-description hover:text-brand-primary ml-auto cursor-pointer transition-colors"
-      >
-        すべて解除
-      </button>
+          同じ悩みで相談する →
+        </a>
+      </div>
     </div>
   );
 }
 
-function MentorResult({ count }: { count: number }) {
+// ── フィルターに合致するメンターを計算 ──
+
+const DISPLAY_COUNT = 8;
+
+function useFilteredMentors(
+  selectedCategory: string | null,
+  selectedTech: Set<string>,
+  selectedTrend: string | null,
+): { displayed: typeof mentors; totalCount: number } {
+  return useMemo(() => {
+    const sortByAvailability = (list: typeof mentors) =>
+      [...list].sort((a, b) => {
+        const order = { available: 0, few: 1, full: 2 } as const;
+        return order[a.availability] - order[b.availability];
+      });
+
+    // トレンドトピックが選択されている場合
+    if (selectedTrend) {
+      const trend = trendingTopics.find((t) => t.label === selectedTrend);
+      if (!trend) return { displayed: [], totalCount: 0 };
+      if (trend.matchSkills.length === 0) {
+        const all = mentors.filter((m) => m.availability !== "full");
+        return { displayed: all.slice(0, DISPLAY_COUNT), totalCount: all.length };
+      }
+      const skillSet = new Set(trend.matchSkills.map((s) => s.toLowerCase()));
+      const matched = sortByAvailability(
+        mentors.filter((m) => m.skills.some((s) => skillSet.has(s.toLowerCase())))
+      );
+      return { displayed: matched.slice(0, DISPLAY_COUNT), totalCount: matched.length };
+    }
+
+    // カテゴリから relatedTech を取得
+    const catTech = selectedCategory
+      ? (categories.find((c) => c.id === selectedCategory)?.relatedTech ?? [])
+      : [];
+
+    const allTech = new Set([
+      ...catTech.map((t) => t.toLowerCase()),
+      ...[...selectedTech].map((t) => t.toLowerCase()),
+    ]);
+
+    if (!selectedCategory && selectedTech.size === 0) return { displayed: [], totalCount: 0 };
+
+    if (allTech.size === 0) {
+      const all = mentors.filter((m) => m.availability !== "full");
+      return { displayed: all.slice(0, DISPLAY_COUNT), totalCount: all.length };
+    }
+
+    const matched = sortByAvailability(
+      mentors.filter((m) => m.skills.some((s) => allTech.has(s.toLowerCase())))
+    );
+    return { displayed: matched.slice(0, DISPLAY_COUNT), totalCount: matched.length };
+  }, [selectedCategory, selectedTech, selectedTrend]);
+}
+
+// ── タブ切り替え ──
+
+type ConsultationTab = "find" | "examples";
+
+function TabToggle({ tab, onChange }: { tab: ConsultationTab; onChange: (t: ConsultationTab) => void }) {
+  const tabs: { id: ConsultationTab; label: string }[] = [
+    { id: "find", label: "メンターを探す" },
+    { id: "examples", label: "みんなの相談事例" },
+  ];
   return (
-    <div className="flex items-center justify-between bg-white border-2 border-brand-primary rounded-xl px-5 py-4">
-      <div>
-        <p className="text-sm text-text-description">条件に合うメンター</p>
-        <p className="text-2xl font-bold text-text-body">
-          {count}<span className="text-sm font-medium ml-0.5">名</span>
-        </p>
-      </div>
-      <a
-        href="#"
-        className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand-primary text-white text-sm font-bold rounded-full hover:opacity-80 transition-opacity"
-      >
-        メンターを見る
-        <ArrowRightIcon size={14} />
-      </a>
+    <div className="flex border-b border-border-primary mb-6">
+      {tabs.map((t) => (
+        <button
+          key={t.id}
+          type="button"
+          onClick={() => onChange(t.id)}
+          className={`flex-1 py-2.5 text-sm font-bold text-center transition-colors cursor-pointer ${
+            tab === t.id
+              ? "text-brand-primary border-b-2 border-brand-primary"
+              : "text-text-description hover:text-text-body"
+          }`}
+        >
+          {t.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -492,32 +327,18 @@ function MentorResult({ count }: { count: number }) {
 // ── メインコンポーネント ──
 
 export default function ConsultationList() {
+  const [activeTab, setActiveTab] = useState<ConsultationTab>("find");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProblems, setSelectedProblems] = useState<Set<string>>(new Set());
   const [selectedTech, setSelectedTech] = useState<Set<string>>(new Set());
-  const [isProblemOpen, setIsProblemOpen] = useState(false);
-  const [isTechOpen, setIsTechOpen] = useState(false);
-  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [selectedTrend, setSelectedTrend] = useState<string | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [visibleConsultations, setVisibleConsultations] = useState(4);
 
-  // カテゴリ選択で関連タグをハイライト
-  const activeCat = categories.find((c) => c.id === selectedCategory);
-  const highlightedProblems = new Set(activeCat?.relatedProblems ?? []);
-  const highlightedTech = new Set(activeCat?.relatedTech ?? []);
-
-  // フィルタ操作
   const toggleCategory = (id: string) => {
-    if (selectedCategory === id) {
-      setSelectedCategory(null);
-    } else {
-      setSelectedCategory(id);
-      // カテゴリを選んだら絞り込みセクションを開く（関連タグがある場合）
-      const cat = categories.find((c) => c.id === id);
-      if (cat && cat.relatedProblems.length > 0) setIsProblemOpen(true);
-      if (cat && cat.relatedTech.length > 0) setIsTechOpen(true);
-    }
+    setSelectedCategory((prev) => (prev === id ? null : id));
+    setSelectedTrend(null); // カテゴリ選択でトレンド解除
   };
-
   const toggleProblem = (id: string) => {
     setSelectedProblems((prev) => {
       const next = new Set(prev);
@@ -526,7 +347,6 @@ export default function ConsultationList() {
       return next;
     });
   };
-
   const toggleTech = (id: string) => {
     setSelectedTech((prev) => {
       const next = new Set(prev);
@@ -535,14 +355,15 @@ export default function ConsultationList() {
       return next;
     });
   };
-
   const clearAll = () => {
     setSelectedCategory(null);
     setSelectedProblems(new Set());
     setSelectedTech(new Set());
+    setSelectedTrend(null);
   };
 
-  const hasActiveFilters = selectedCategory || selectedProblems.size > 0 || selectedTech.size > 0;
+  const hasActiveFilters = !!selectedCategory || selectedProblems.size > 0 || selectedTech.size > 0 || !!selectedTrend;
+  const { displayed: filteredMentors, totalCount: totalMentorCount } = useFilteredMentors(selectedCategory, selectedTech, selectedTrend);
 
   // 相談事例のフィルタリング
   const filteredConsultations = hasActiveFilters
@@ -552,157 +373,219 @@ export default function ConsultationList() {
       })
     : pastConsultations;
 
-  // メンター数（仮計算：160名が母数）
-  const mentorCount = hasActiveFilters
-    ? (activeCat?.mentorCount ?? 160) - selectedProblems.size * 5 - selectedTech.size * 3
-    : 0;
-
-  // 表示するカテゴリ数
-  const visibleCategories = showAllCategories ? categories : categories.slice(0, 6);
-
   return (
     <div>
-      <p className="text-sm text-text-description mb-6">
-        「こんなこと聞いていいのかな？」→{" "}
-        <span className="font-bold text-brand-primary">大丈夫です！</span>
-        気軽に相談してみましょう
-      </p>
+      <TabToggle tab={activeTab} onChange={setActiveTab} />
 
-      {/* 1. みんなの相談事例（フィルタ連動） */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-text-body">みんなの相談事例</h3>
-            {hasActiveFilters && (
-              <span className="text-xs text-text-description bg-bg-secondary px-2 py-1 rounded-full">
-                {filteredConsultations.length}件
+      {activeTab === "find" && (
+      <>
+      {/* ── お悩みカテゴリ ── */}
+      <section className="mb-6">
+        <h3 className="text-lg font-bold text-text-body mb-1">
+          どんなことを話したいですか？
+        </h3>
+        <p className="text-xs text-text-description mb-4">
+          気になるテーマをタップすると、対応できるメンターが見つかります
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => toggleCategory(cat.id)}
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-3 transition-all cursor-pointer text-left border group ${
+                selectedCategory === cat.id
+                  ? "bg-brand-primary/5 border-brand-primary"
+                  : "bg-white border-border-primary hover:border-brand-primary hover:shadow-sm"
+              }`}
+            >
+              <span className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+                selectedCategory === cat.id
+                  ? "bg-brand-primary text-white"
+                  : "bg-bg-quaternary text-brand-primary group-hover:bg-brand-primary group-hover:text-white"
+              }`}>
+                {cat.icon}
               </span>
-            )}
-          </div>
-          <a href="/1on1/consultations" className="text-sm text-brand-primary hover:underline">
-            すべて見る →
-          </a>
+              <span className={`flex-1 text-sm font-bold transition-colors ${
+                selectedCategory === cat.id ? "text-brand-primary" : "text-text-body group-hover:text-brand-primary"
+              }`}>{cat.title}</span>
+            </button>
+          ))}
         </div>
-        {filteredConsultations.length > 0 ? (
+
+        {/* 今みんなが話してること */}
+        <div className="mt-4 pt-4 border-t border-border-primary">
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className="text-xs font-bold text-text-description">今みんなが話してること</span>
+            <span className="text-[10px] text-text-description bg-bg-quaternary px-1.5 py-0.5 rounded">🔥 トレンド</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {trendingTopics.map((topic) => (
+              <button
+                key={topic.label}
+                type="button"
+                onClick={() => {
+                  setSelectedTrend(selectedTrend === topic.label ? null : topic.label);
+                  setSelectedCategory(null); // トレンド選択でカテゴリ解除
+                }}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
+                  selectedTrend === topic.label
+                    ? "bg-brand-primary text-white border-brand-primary"
+                    : "bg-bg-secondary text-text-body border-border-primary hover:bg-brand-primary/5 hover:border-brand-primary hover:text-brand-primary"
+                }`}
+              >
+                <span>{topic.emoji}</span>
+                <span>{topic.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 詳細に絞り込む（折りたたみ） ── */}
+      <section className="mb-6">
+        <button
+          type="button"
+          onClick={() => setIsDetailOpen(!isDetailOpen)}
+          className="flex items-center gap-2 text-sm font-bold text-text-body hover:text-brand-primary cursor-pointer transition-colors mb-3"
+        >
+          <span>詳細に絞り込む</span>
+          {(selectedProblems.size > 0 || selectedTech.size > 0) && (
+            <span className="text-[10px] font-bold text-white bg-brand-primary px-1.5 py-0.5 rounded-full">
+              {selectedProblems.size + selectedTech.size}
+            </span>
+          )}
+          <svg
+            width={14}
+            height={14}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            className={`transition-transform duration-200 ${isDetailOpen ? "rotate-180" : ""}`}
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+
+        <div className={`transition-all duration-200 ease-in-out overflow-hidden ${
+          isDetailOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+        }`}>
+          <div className="bg-white border border-border-primary rounded-xl p-4 flex flex-col gap-4">
+            {/* 課題 */}
+            <div>
+              <h4 className="text-xs font-bold text-text-description mb-2">解決したい課題</h4>
+              <div className="flex flex-wrap gap-2">
+                {problemCategories.map((problem) => (
+                  <FilterTag
+                    key={problem.id}
+                    label={problem.label}
+                    icon={problem.icon}
+                    isSelected={selectedProblems.has(problem.id)}
+                    onToggle={() => toggleProblem(problem.id)}
+                  />
+                ))}
+              </div>
+            </div>
+            {/* 技術分野 */}
+            <div>
+              <h4 className="text-xs font-bold text-text-description mb-2">技術分野</h4>
+              <div className="flex flex-wrap gap-2">
+                {techFields.map((field) => (
+                  <FilterTag
+                    key={field.id}
+                    label={field.label}
+                    isSelected={selectedTech.has(field.id)}
+                    onToggle={() => toggleTech(field.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── フィルターサマリー ── */}
+      {hasActiveFilters && (
+        <div className="flex items-center justify-between bg-bg-secondary rounded-xl px-4 py-3 mb-6">
+          <span className="text-xs text-text-description">
+            <span className="font-bold text-brand-primary">{totalMentorCount}名</span>のメンターが見つかりました
+          </span>
+          <button
+            type="button"
+            onClick={clearAll}
+            className="text-xs text-text-description hover:text-brand-primary cursor-pointer transition-colors"
+          >
+            条件をリセット
+          </button>
+        </div>
+      )}
+
+      {/* ── 対応できるメンター ── */}
+      <section className="mb-8">
+        {filteredMentors.length > 0 ? (
           <>
-            <div className="flex flex-col gap-2">
-              {filteredConsultations.slice(0, visibleConsultations).map((consultation) => (
-                <PastConsultationCard key={consultation.id} consultation={consultation} />
+            <h3 className="text-lg font-bold text-text-body mb-4">
+              {selectedTrend
+                ? `「${selectedTrend}」を話せるメンター`
+                : selectedCategory
+                ? `「${categories.find((c) => c.id === selectedCategory)?.title}」に対応できるメンター`
+                : "対応できるメンター"}
+            </h3>
+            <div className="grid grid-cols-4 gap-3">
+              {filteredMentors.map((mentor) => (
+                <MentorCard key={mentor.name} {...mentor} />
               ))}
             </div>
-            {filteredConsultations.length > visibleConsultations && (
-              <button
-                type="button"
-                onClick={() => setVisibleConsultations((prev) => prev + 4)}
-                className="mt-3 w-full py-2.5 text-sm font-medium text-brand-primary bg-bg-secondary hover:bg-bg-quaternary border border-border-primary rounded-lg transition-colors cursor-pointer"
-              >
-                もっと見る（残り{filteredConsultations.length - visibleConsultations}件）
-              </button>
+            {totalMentorCount > DISPLAY_COUNT && (
+              <div className="mt-4 text-center">
+                <span className="text-sm text-text-description">
+                  他 <span className="font-bold text-brand-primary">{totalMentorCount - DISPLAY_COUNT}名</span> も対応可能
+                </span>
+                <span className="text-text-description mx-2">·</span>
+                <a href="/1on1/mentors" className="text-sm font-bold text-brand-primary hover:underline">
+                  すべてのメンターを見る →
+                </a>
+              </div>
             )}
           </>
         ) : (
-          <div className="text-center py-8 text-text-description text-sm">
-            この条件に一致する相談事例はまだありません
+          <div className="flex flex-col items-center justify-center py-10 border border-dashed border-border-primary rounded-xl text-center">
+            <svg width={32} height={32} viewBox="0 0 24 24" fill="currentColor" className="text-text-description/40 mb-3">
+              <path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM12 6C14.6888 6 16.8818 7.71832 17.6265 10.0693L15.7311 10.5532C15.2519 8.93032 13.7614 8 12 8C10.2386 8 8.74815 8.93032 8.26888 10.5532L6.37349 10.0693C7.11818 7.71832 9.31122 6 12 6Z" />
+            </svg>
+            <p className="text-sm text-text-description">
+              上のカテゴリやトレンドを選ぶと、ここにメンターが表示されます
+            </p>
           </div>
         )}
       </section>
+      </>
+      )}
 
-      {/* 区切り */}
-      <div className="border-t border-border-primary mb-8" />
-
-      {/* 2. お悩みカテゴリ */}
-      <section className="mb-6">
-        <h3 className="text-lg font-bold text-text-body mb-4">お悩みカテゴリから選ぶ</h3>
-        <div className="grid grid-cols-3 gap-4">
-          {visibleCategories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              category={category}
-              isSelected={selectedCategory === category.id}
-              onToggle={() => toggleCategory(category.id)}
-            />
+      {/* ── みんなの相談事例タブ ── */}
+      {activeTab === "examples" && (
+      <section>
+        <p className="text-sm text-text-description mb-6">
+          実際に1on1を利用した方の相談事例です。「こんなこと聞いていいのかな？」→{" "}
+          <span className="font-bold text-brand-primary">大丈夫です！</span>
+        </p>
+        <div className="flex flex-col gap-2">
+          {pastConsultations.slice(0, visibleConsultations).map((consultation) => (
+            <PastConsultationCard key={consultation.id} consultation={consultation} />
           ))}
         </div>
-        {categories.length > 6 && (
+        {pastConsultations.length > visibleConsultations && (
           <button
             type="button"
-            onClick={() => setShowAllCategories(!showAllCategories)}
-            className="mt-4 mx-auto flex items-center gap-1 text-sm text-brand-primary hover:underline cursor-pointer"
+            onClick={() => setVisibleConsultations((prev) => prev + 4)}
+            className="mt-3 w-full py-2.5 text-sm font-medium text-brand-primary bg-bg-secondary hover:bg-bg-quaternary border border-border-primary rounded-lg transition-colors cursor-pointer"
           >
-            {showAllCategories ? "閉じる" : `他${categories.length - 6}件を見る`}
-            <svg
-              width={14}
-              height={14}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              className={`transition-transform ${showAllCategories ? "rotate-180" : ""}`}
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
+            もっと見る（残り{pastConsultations.length - visibleConsultations}件）
           </button>
         )}
       </section>
-
-      {/* 3. 絞り込みフィルタ（折りたたみ） */}
-      <section className="flex flex-col gap-3 mb-6">
-        <CollapsibleSection
-          title="課題で絞り込む"
-          isOpen={isProblemOpen}
-          onToggle={() => setIsProblemOpen(!isProblemOpen)}
-          count={selectedProblems.size}
-        >
-          <div className="flex flex-wrap gap-2">
-            {problemCategories.map((problem) => (
-              <FilterTagButton
-                key={problem.id}
-                label={problem.label}
-                icon={problem.icon}
-                isSelected={selectedProblems.has(problem.id)}
-                isHighlighted={highlightedProblems.has(problem.id)}
-                onToggle={() => toggleProblem(problem.id)}
-              />
-            ))}
-          </div>
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title="技術分野で絞り込む"
-          isOpen={isTechOpen}
-          onToggle={() => setIsTechOpen(!isTechOpen)}
-          count={selectedTech.size}
-        >
-          <div className="flex flex-wrap gap-2">
-            {techFields.map((field) => (
-              <FilterTagButton
-                key={field.id}
-                label={field.label}
-                isSelected={selectedTech.has(field.id)}
-                isHighlighted={highlightedTech.has(field.id)}
-                onToggle={() => toggleTech(field.id)}
-              />
-            ))}
-          </div>
-        </CollapsibleSection>
-      </section>
-
-      {/* 4. アクティブフィルタ表示 + 結果 */}
-      {hasActiveFilters && (
-        <section className="flex flex-col gap-4 mb-8">
-          <ActiveFilters
-            selectedCategory={selectedCategory}
-            selectedProblems={selectedProblems}
-            selectedTech={selectedTech}
-            onClearCategory={() => setSelectedCategory(null)}
-            onClearProblem={(id) => toggleProblem(id)}
-            onClearTech={(id) => toggleTech(id)}
-            onClearAll={clearAll}
-          />
-          <MentorResult count={Math.max(mentorCount, 3)} />
-        </section>
       )}
-
     </div>
   );
 }

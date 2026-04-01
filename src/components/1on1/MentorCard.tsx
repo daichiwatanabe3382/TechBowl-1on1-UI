@@ -10,6 +10,7 @@ type MentorCardProps = {
   avatarSeed?: string;
   avatarUrl?: string;
   availability?: Availability;
+  recentTopics?: string[];
 };
 
 /**
@@ -60,6 +61,7 @@ export default function MentorCard({
   avatarSeed,
   avatarUrl,
   availability = "available",
+  recentTopics,
 }: MentorCardProps) {
   const avail = availabilityConfig[availability];
   return (
@@ -121,6 +123,25 @@ export default function MentorCard({
           </span>
         ))}
       </div>
+
+      {/* Recent consultation topics */}
+      {recentTopics && recentTopics.length > 0 && (
+        <div className="flex items-center gap-1.5 mt-2.5 pt-2.5 border-t border-border-primary">
+          <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-text-description">
+            <path d="M5.76282 17H20V5H4V18.3851L5.76282 17ZM6.45455 19L2 22.5V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V18C22 18.5523 21.5523 19 21 19H6.45455Z" />
+          </svg>
+          <div className="flex flex-wrap gap-1">
+            {recentTopics.map((topic) => (
+              <span
+                key={topic}
+                className="inline-block px-2 py-0.5 text-[11px] font-medium text-brand-primary bg-brand-primary/5 rounded-full"
+              >
+                {topic}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </a>
   );
 }
