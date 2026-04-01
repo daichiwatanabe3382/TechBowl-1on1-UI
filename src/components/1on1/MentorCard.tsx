@@ -112,9 +112,17 @@ export default function MentorCard({
         )}
       </div>
 
-      {/* Skills */}
-      <div className="flex flex-wrap gap-1 mt-2">
-        {skills.map((skill) => (
+      {/* Specialty + Skills */}
+      <div className="flex flex-wrap items-center gap-1 mt-2">
+        {skills.length > 0 && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold text-brand-primary bg-brand-primary/8 border border-brand-primary/20 rounded-full">
+            <svg width={10} height={10} viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
+              <path d="M12 1L15.09 7.26L22 8.27L17 13.14L18.18 20.02L12 16.77L5.82 20.02L7 13.14L2 8.27L8.91 7.26L12 1Z" />
+            </svg>
+            {skills[0]}
+          </span>
+        )}
+        {skills.slice(1).map((skill) => (
           <span
             key={skill}
             className="inline-block px-1.5 py-0.5 text-[11px] text-text-body bg-bg-quaternary rounded"

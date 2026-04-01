@@ -11,6 +11,8 @@ import {
   CouponLineIcon,
   TicketIcon,
 } from "@/components/icons";
+import { PastConsultationCard, type PastConsultation } from "@/components/1on1/ConsultationList";
+import { TopicCard, type TopicContent } from "@/components/1on1/TopicList";
 
 // --- Sidebar items (shared with other 1on1 pages) ---
 const sidebarItems = [
@@ -33,11 +35,16 @@ const mentorData = {
   bio: "TechBowl Inc.でソフトウェアエンジニアとして従事。テスト自動化やCI/CDの設計・運用に強みを持ち、個人でもOSSのテストフレームワーク開発に取り組んでいる。TechTrainではテスト設計やCI/CD構築をテーマに1on1を行い、初心者から中級者まで幅広く対応。",
   skills: ["TypeScript", "React", "Next.js", "CI/CD", "テスト自動化", "GitHub Actions"],
   stats: { totalSessions: 128, repeatRate: 84, avgRating: 4.8 },
-  topics: [
-    { id: "1", title: "実践ハーネスエンジニアリング", category: "登壇資料・スライド", source: "Speaker Deck", thumbnail: "/image/topic/slide-thumb-01.png", updatedAt: "2026-03-30" },
-    { id: "2", title: "テスト自動化のベストプラクティス", category: "技術記事", source: "Zenn", thumbnail: "/image/topic/article-thumb-01.png", updatedAt: "2026-03-25" },
-    { id: "3", title: "CI/CDパイプライン設計入門", category: "技術記事", source: "Qiita", thumbnail: "/image/topic/article-thumb-02.png", updatedAt: "2026-03-18" },
-  ],
+  topicContents: [
+    { id: "1", title: "実践ハーネスエンジニアリング", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "登壇資料・スライド", source: "Speaker Deck", thumbnail: "/image/placeholder-article-1.svg", topics: ["テストハーネスの設計パターン", "E2Eテストの自動化戦略"], summary: "テストハーネスの設計から運用までを体系的に解説。実プロジェクトでの導入事例を交えながら、持続可能なテスト基盤の構築方法を紹介。", updatedAt: "2026-03-30" },
+    { id: "2", title: "テスト自動化のベストプラクティス", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "技術記事", source: "Zenn", thumbnail: "/image/placeholder-article-2.svg", topics: ["テスト戦略の立て方", "CI/CDでの自動テスト"], summary: "ユニットテスト・統合テスト・E2Eテストの使い分けと、チームで回すための自動化のコツ。", updatedAt: "2026-03-25" },
+    { id: "3", title: "CI/CDパイプライン設計入門", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "技術記事", source: "Qiita", thumbnail: "/image/placeholder-article-1.svg", topics: ["GitHub Actionsの活用", "デプロイ自動化"], summary: "GitHub Actionsを使ったCI/CDパイプラインの設計と、段階的な自動化の進め方を解説。", updatedAt: "2026-03-18" },
+  ] satisfies TopicContent[],
+  consultations: [
+    { id: "c1", before: "テストを書く習慣がなく、リファクタリングが怖い", after: "テスト戦略が明確になり、安心してコードを変えられるように", caption: "どこからテストを書き始めるか、優先順位を一緒に整理してもらえました", categoryLabel: "コードレビュー", categoryId: "code-review", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.20" },
+    { id: "c2", before: "CI/CDのビルドが毎回10分以上かかって辛い", after: "キャッシュ戦略とステージ分割で3分に短縮", caption: "ボトルネックの特定方法から教えてもらい、自分でも改善を続けられるようになりました", categoryLabel: "業務で詰まっている", categoryId: "stuck", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.15" },
+    { id: "c3", before: "GitHub Actionsのワークフロー、何が正解かわからない", after: "チーム規模に合った現実的な構成が決まった", caption: "理想と現実のバランスを考慮して提案してくれたのが助かりました", categoryLabel: "技術選定", categoryId: "tech-selection", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.10" },
+  ] satisfies PastConsultation[],
   reviews: [
     { id: "1", userName: "ユーザーA", rating: 5, comment: "テスト設計について非常にわかりやすく教えていただけました。実務にすぐ活かせる内容でした。", date: "2026-03-20" },
     { id: "2", userName: "ユーザーB", rating: 5, comment: "CI/CDの構築で悩んでいたところを的確にアドバイスしてもらえました。", date: "2026-03-15" },
@@ -60,13 +67,6 @@ const availabilityConfig = {
   full: { label: "いっぱい", colors: "text-[#6b7280] bg-[#f3f4f6] border-[#e5e7eb]" },
 };
 
-const categoryColors: Record<string, string> = {
-  "技術記事": "bg-blue-50 text-blue-600",
-  "書籍・雑誌": "bg-amber-50 text-amber-600",
-  "登壇資料・スライド": "bg-green-50 text-green-600",
-  "OSS・個人開発": "bg-purple-50 text-purple-600",
-};
-
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-0.5">
@@ -80,7 +80,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function MentorDetailPage() {
-  const [activeTab, setActiveTab] = useState<"about" | "topics" | "reviews">("about");
+  const [activeTab, setActiveTab] = useState<"about" | "topics" | "consultations" | "reviews">("about");
   const mentor = mentorData;
   const avail = availabilityConfig[mentor.availability];
 
@@ -197,6 +197,7 @@ export default function MentorDetailPage() {
           {([
             { key: "about", label: "プロフィール" },
             { key: "topics", label: "トピック" },
+            { key: "consultations", label: "相談履歴" },
             { key: "reviews", label: "レビュー" },
           ] as const).map((tab) => (
             <button
@@ -252,25 +253,17 @@ export default function MentorDetailPage() {
           )}
 
           {activeTab === "topics" && (
-            <div className="space-y-4">
-              {mentor.topics.map((topic) => (
-                <a key={topic.id} href="#" className="flex items-start gap-4 p-4 rounded-xl border border-border-primary hover:border-brand-primary transition-colors">
-                  <div className="shrink-0 w-32">
-                    <div className="relative aspect-[16/9] rounded-lg overflow-hidden bg-bg-quaternary">
-                      <Image src={topic.thumbnail} alt={topic.title} fill className="object-cover" />
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`px-2 py-0.5 text-[11px] font-medium rounded-full ${categoryColors[topic.category] || "bg-gray-50 text-gray-600"}`}>
-                        {topic.category}
-                      </span>
-                      <span className="text-xs text-text-description">{topic.updatedAt}</span>
-                    </div>
-                    <h3 className="text-sm font-bold text-text-body line-clamp-2">{topic.title}</h3>
-                    <p className="text-xs text-text-description mt-1">{topic.source}</p>
-                  </div>
-                </a>
+            <div className="grid grid-cols-3 gap-3">
+              {mentor.topicContents.map((topic) => (
+                <TopicCard key={topic.id} content={topic} />
+              ))}
+            </div>
+          )}
+
+          {activeTab === "consultations" && (
+            <div className="flex flex-col gap-2">
+              {mentor.consultations.map((consultation) => (
+                <PastConsultationCard key={consultation.id} consultation={consultation} />
               ))}
             </div>
           )}

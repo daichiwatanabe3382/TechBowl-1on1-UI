@@ -205,7 +205,8 @@ function FilterTag({
   );
 }
 
-function PastConsultationCard({ consultation }: { consultation: PastConsultation }) {
+export { type PastConsultation };
+export function PastConsultationCard({ consultation }: { consultation: PastConsultation }) {
   return (
     <div className="bg-white border border-border-primary rounded-xl p-4 hover:border-brand-primary transition-colors">
       <div className="flex flex-col gap-1.5">

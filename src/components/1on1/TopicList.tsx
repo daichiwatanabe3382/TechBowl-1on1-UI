@@ -5,7 +5,7 @@ import Image from "next/image";
 
 type ViewMode = "grid" | "timeline";
 
-type TopicContent = {
+export type TopicContent = {
   id: string;
   title: string;
   mentorName: string;
@@ -318,7 +318,7 @@ const media: TopicContent[] = [
   },
 ];
 
-function TopicCard({ content }: { content: TopicContent }) {
+export function TopicCard({ content }: { content: TopicContent }) {
   const catColor = categoryColors[content.category ?? ""] ?? "bg-gray-50 text-gray-600";
   return (
     <div className="group flex flex-col bg-white border border-border-primary rounded-xl overflow-hidden hover:border-brand-primary transition-colors text-left">
@@ -404,14 +404,14 @@ function TopicCard({ content }: { content: TopicContent }) {
   );
 }
 
-const categoryColors: Record<string, string> = {
+export const categoryColors: Record<string, string> = {
   "技術記事": "bg-blue-50 text-blue-600",
   "書籍・雑誌": "bg-amber-50 text-amber-600",
   "登壇資料・スライド": "bg-emerald-50 text-emerald-600",
   "メディア": "bg-purple-50 text-purple-600",
 };
 
-function formatDate(dateStr?: string) {
+export function formatDate(dateStr?: string) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   const now = new Date();
