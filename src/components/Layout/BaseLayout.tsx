@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
 
 type BaseLayoutProps = {
   children: React.ReactNode;
@@ -19,8 +20,9 @@ export default function BaseLayout({
     <div className="flex flex-col min-h-screen bg-white">
       <Header activeNav={activeNav} ticketCount={ticketCount} />
       {headerBanner}
-      <main className="flex flex-1 justify-center w-full">{children}</main>
+      <main className="flex flex-1 justify-center w-full pb-14 md:pb-0">{children}</main>
       <Footer />
+      <BottomNav activeNav={activeNav} />
     </div>
   );
 }

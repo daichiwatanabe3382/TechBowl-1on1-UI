@@ -394,7 +394,7 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
         <p className="text-xs text-text-description mb-4">
           気になるテーマをタップすると、対応できるメンターが見つかります
         </p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -540,7 +540,7 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
                 ? `「${categories.find((c) => c.id === selectedCategory)?.title}」に対応できるメンター`
                 : "対応できるメンター"}
             </h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               {filteredMentors.map((mentor) => (
                 <MentorCard key={mentor.name} {...mentor} />
               ))}

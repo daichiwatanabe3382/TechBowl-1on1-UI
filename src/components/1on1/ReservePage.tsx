@@ -26,7 +26,7 @@ export default function ReservePage() {
       </h2>
 
       {/* 共通タブ */}
-      <div className="grid grid-cols-3 gap-3 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 md:mb-8">
         {tabs.map((tab) => {
           const isActive = mode === tab.id;
           return (

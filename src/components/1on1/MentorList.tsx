@@ -171,7 +171,7 @@ export default function MentorList() {
       </div>
 
       {/* Mentor Grid */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {filtered.map((mentor) => (
           <MentorCard key={mentor.name} {...mentor} />
         ))}

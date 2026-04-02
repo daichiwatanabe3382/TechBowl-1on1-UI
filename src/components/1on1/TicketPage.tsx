@@ -68,8 +68,8 @@ export default function TicketPage() {
   return (
     <div className="max-w-[800px] mx-auto">
       {/* === 現在のチケット数 === */}
-      <div className="mt-10">
-        <div className="border border-[#3d3d5c] rounded-2xl p-6 flex flex-col gap-3">
+      <div className="mt-6 md:mt-10">
+        <div className="border border-[#3d3d5c] rounded-2xl p-4 md:p-6 flex flex-col gap-3">
           {/* チケット数 */}
           <div>
             <p className="text-sm font-bold text-[#3d3d5c]">現在のチケット数</p>
@@ -108,7 +108,7 @@ export default function TicketPage() {
       </div>
 
       {/* === 条件を達成してチケットを増やす === */}
-      <div className="pt-10">
+      <div className="pt-6 md:pt-10">
         <h2 className="text-2xl font-bold text-text-body leading-tight">条件を達成してチケットを増やす</h2>
         <p className="text-sm text-text-description leading-[1.75] mt-1">
           用意された方法を行って、チケットをゲットしよう！
@@ -116,7 +116,7 @@ export default function TicketPage() {
       </div>
 
       <div className="pt-3">
-        <div className="border border-[#3d3d5c] rounded-2xl px-6 py-4 flex flex-col items-center">
+        <div className="border border-[#3d3d5c] rounded-2xl px-4 py-3 md:px-6 md:py-4 flex flex-col items-center">
           {achievementItems.map((label, i) => (
             <div
               key={i}
@@ -140,7 +140,7 @@ export default function TicketPage() {
       </div>
 
       {/* === チケットを購入して増やす === */}
-      <div className="pt-10">
+      <div className="pt-6 md:pt-10">
         <h2 className="text-2xl font-bold text-text-body leading-tight">チケットを購入して増やす</h2>
         <p className="text-sm text-text-description leading-[1.75] mt-1">
           1回のセッション(30分)につき、1枚のチケットが必要です。
@@ -148,7 +148,7 @@ export default function TicketPage() {
       </div>
 
       <div className="pt-3 pb-16">
-        <div className="border border-[#3d3d5c] rounded-2xl p-6 flex flex-col gap-6">
+        <div className="border border-[#3d3d5c] rounded-2xl p-4 md:p-6 flex flex-col gap-6">
           {/* 購入する枚数 */}
           <div className="flex flex-col gap-2">
             <p className="text-base font-bold text-text-body leading-[1.75]">購入する枚数</p>

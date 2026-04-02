@@ -40,6 +40,13 @@ const sidebarItems = [
   },
 ] as const;
 
+const mobileLabels: Record<string, string> = {
+  reserve: "予約",
+  manage: "管理",
+  feedback: "FB一覧",
+  ticket: "チケット",
+};
+
 const validTabs = ["reserve", "manage", "feedback", "ticket"] as const;
 
 export default function OneOnOnePage() {
@@ -60,7 +67,7 @@ function OneOnOnePageContent() {
     <TwoColumnLayout
       activeNav="1on1"
       headerBanner={
-        <div className="w-full h-[140px] overflow-hidden">
+        <div className="w-full h-[100px] md:h-[140px] overflow-hidden">
           <img
             src="/image/1on1/headerbanner-1on1.png"
             alt="1on1 - メンターと話しながら技術やキャリアについて思考を深めよう"
@@ -84,8 +91,30 @@ function OneOnOnePageContent() {
           })}
         </nav>
       }
+      mobileTabs={
+        <div className="flex border-b border-border-primary bg-bg-primary overflow-x-auto">
+          {sidebarItems.map((item) => {
+            const isActive = activeItem === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setActiveItem(item.id)}
+                className={`flex items-center gap-1.5 px-4 py-3 text-sm font-bold whitespace-nowrap shrink-0 transition-colors ${
+                  isActive
+                    ? "text-brand-primary border-b-2 border-brand-primary"
+                    : "text-text-description"
+                }`}
+              >
+                {isActive ? item.activeIcon : item.defaultIcon}
+                <span>{mobileLabels[item.id] ?? item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      }
     >
-      <div className="py-6">
+      <div className="py-4 md:py-6">
         {activeItem === "reserve" && <ReservePage />}
         {activeItem === "manage" && (
           <div>

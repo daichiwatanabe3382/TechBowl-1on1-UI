@@ -638,7 +638,7 @@ function CategoryGrid() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {visible.map((content) => (
           <TopicCard key={content.id} content={content} />
         ))}
