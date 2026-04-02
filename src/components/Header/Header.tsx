@@ -1,25 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import HeaderButton from "./HeaderButton";
-import DropdownMenu, { DropdownItem } from "./DropdownMenu";
 import {
   ChatIcon,
   BriefcaseIcon,
   AccountCircleIcon,
-  GridIcon,
+  GraduationCapIcon,
+  FileListIcon,
   NotificationIcon,
   TicketIcon,
   AddIcon,
-  TerminalBoxIcon,
-  ArticleIcon,
 } from "@/components/icons";
 
 type NavItem = {
   Icon: React.ComponentType<{ size?: number; filled?: boolean }>;
   label: string;
   href?: string;
-  hasDropdown?: boolean;
 };
 
 type HeaderProps = {
@@ -30,26 +26,12 @@ type HeaderProps = {
 const navItems: NavItem[] = [
   { Icon: ChatIcon, label: "1on1", href: "/1on1" },
   { Icon: BriefcaseIcon, label: "スカウト", href: "/scout" },
+  { Icon: GraduationCapIcon, label: "学ぶ", href: "/learn" },
+  { Icon: FileListIcon, label: "メディア", href: "/media" },
   { Icon: AccountCircleIcon, label: "マイページ", href: "/" },
-  { Icon: GridIcon, label: "その他", hasDropdown: true },
-];
-
-const dropdownItems: DropdownItem[] = [
-  {
-    icon: <TerminalBoxIcon size={16} />,
-    label: "実践問題集",
-    href: "/practice",
-  },
-  {
-    icon: <ArticleIcon size={16} />,
-    label: "テックメディア",
-    href: "/media",
-  },
 ];
 
 export default function Header({ ticketCount = 4, activeNav }: HeaderProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   return (
     <header className="sticky top-0 z-50 flex items-center gap-4 bg-bg-primary border-b border-border-primary pl-4 pr-6 py-3 w-full">
       {/* Logo */}
@@ -65,27 +47,7 @@ export default function Header({ ticketCount = 4, activeNav }: HeaderProps) {
       {/* Navigation */}
       <nav className="flex flex-1 gap-2 items-center">
         {navItems.map((item) => {
-          const isActive =
-            activeNav === item.label || (item.hasDropdown && isDropdownOpen);
-
-          if (item.hasDropdown) {
-            return (
-              <div key={item.label} className="relative">
-                <HeaderButton
-                  icon={<item.Icon filled={isActive} />}
-                  label={item.label}
-                  isActive={isActive}
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                />
-                <DropdownMenu
-                  items={dropdownItems}
-                  isOpen={isDropdownOpen}
-                  onClose={() => setIsDropdownOpen(false)}
-                />
-              </div>
-            );
-          }
-
+          const isActive = activeNav === item.label;
           return (
             <HeaderButton
               key={item.label}
@@ -108,7 +70,7 @@ export default function Header({ ticketCount = 4, activeNav }: HeaderProps) {
 
       {/* Ticket Counter */}
       <a
-        href="/tickets"
+        href="/1on1?tab=ticket"
         className="flex items-center border border-border-secondary rounded-full overflow-hidden shrink-0"
       >
         <div className="flex items-center gap-1 pl-4 pr-3 py-1 border-r border-border-secondary">

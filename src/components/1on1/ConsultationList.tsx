@@ -515,9 +515,9 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
 
       {/* ── フィルターサマリー ── */}
       {hasActiveFilters && (
-        <div className="flex items-center justify-between bg-bg-secondary rounded-xl px-4 py-3 mb-6">
-          <span className="text-xs text-text-description">
-            <span className="font-bold text-brand-primary">{totalMentorCount}名</span>のメンターが見つかりました
+        <div className="flex items-center justify-between bg-brand-primary/5 rounded-xl px-4 py-3 mb-6 border border-brand-primary/10">
+          <span className="text-sm text-text-body">
+            🎯 あなたにおすすめのメンターを<span className="font-bold text-brand-primary"> {DISPLAY_COUNT}名 </span>厳選しました！
           </span>
           <button
             type="button"
@@ -540,7 +540,7 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
                 ? `「${categories.find((c) => c.id === selectedCategory)?.title}」に対応できるメンター`
                 : "対応できるメンター"}
             </h3>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               {filteredMentors.map((mentor) => (
                 <MentorCard key={mentor.name} {...mentor} />
               ))}
@@ -572,9 +572,7 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-10 border border-dashed border-border-primary rounded-xl text-center">
-            <svg width={32} height={32} viewBox="0 0 24 24" fill="currentColor" className="text-text-description/40 mb-3">
-              <path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM12 6C14.6888 6 16.8818 7.71832 17.6265 10.0693L15.7311 10.5532C15.2519 8.93032 13.7614 8 12 8C10.2386 8 8.74815 8.93032 8.26888 10.5532L6.37349 10.0693C7.11818 7.71832 9.31122 6 12 6Z" />
-            </svg>
+            <img src="/image/1on1/praise.png" alt="" className="w-20 h-20 object-contain mb-3" />
             <p className="text-sm text-text-description">
               上のカテゴリやトレンドを選ぶと、ここにメンターが表示されます
             </p>

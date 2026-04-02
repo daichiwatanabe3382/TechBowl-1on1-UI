@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { TwoColumnLayout } from "@/components/Layout";
 import SidebarButton from "@/components/SidebarButton";
 import { ReservePage, TicketPage } from "@/components/1on1";
@@ -39,8 +40,13 @@ const sidebarItems = [
   },
 ] as const;
 
+const validTabs = ["reserve", "manage", "feedback", "ticket"] as const;
+
 export default function OneOnOnePage() {
-  const [activeItem, setActiveItem] = useState("reserve");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const initialTab = validTabs.includes(tabParam as (typeof validTabs)[number]) ? tabParam! : "reserve";
+  const [activeItem, setActiveItem] = useState(initialTab);
 
   return (
     <TwoColumnLayout

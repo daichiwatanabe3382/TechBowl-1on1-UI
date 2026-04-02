@@ -334,3 +334,29 @@ export function AccountCircleIcon({ size = 14, filled = false, ...props }: IconP
     </svg>
   );
 }
+
+/** graduation-cap-line / graduation-cap-fill */
+export function GraduationCapIcon({ size = 14, filled = false, ...props }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" {...props}>
+      {filled ? (
+        <path d="M12 2L0 9L12 16L22 10.1667V17.5H24V9L12 2ZM3.99902 13.4905V18.0001C3.99902 20.2092 7.58075 22.0001 11.999 22.0001C16.4173 22.0001 19.999 20.2092 19.999 18.0001V13.4905L11.999 18.1572L3.99902 13.4905Z" />
+      ) : (
+        <path d="M12 2L0 9L12 16L22 10.1667V17.5H24V9L12 2ZM12 13.4828L3.99902 8.99139L12 4.5L20.001 8.99139L12 13.4828ZM3.99902 13.4905V18.0001C3.99902 20.2092 7.58075 22.0001 11.999 22.0001C16.4173 22.0001 19.999 20.2092 19.999 18.0001V13.4905L11.999 18.1572L3.99902 13.4905ZM5.99902 14.6529L11.999 18.0001L17.999 14.6529V18.0001C17.999 18.8285 15.3128 20.0001 11.999 20.0001C8.68531 20.0001 5.99902 18.8285 5.99902 18.0001V14.6529Z" />
+      )}
+    </svg>
+  );
+}
+
+/** file-list-3-line / file-list-3-fill */
+export function FileListIcon({ size = 14, filled = false, ...props }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" {...props}>
+      {filled ? (
+        <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM8 7V9H16V7H8ZM8 11V13H16V11H8ZM8 15V17H13V15H8Z" />
+      ) : (
+        <path d="M19 22H5C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V21C20 21.5523 19.5523 22 19 22ZM18 20V4H6V20H18ZM8 7H16V9H8V7ZM8 11H16V13H8V11ZM8 15H13V17H8V15Z" />
+      )}
+    </svg>
+  );
+}
