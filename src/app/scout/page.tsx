@@ -7,7 +7,7 @@ export default function ScoutPage() {
       headerBanner={
         <div className="w-full overflow-hidden">
           <img
-            src="/image/scout/scout.png"
+            src="/image/scout/headerbanner-scout.png"
             alt="思考が伝えて、興味のある企業と話そう"
             className="w-full h-[80px] object-cover lg:h-auto lg:object-contain"
           />
