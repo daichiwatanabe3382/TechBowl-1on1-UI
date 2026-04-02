@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 type TwoColumnLayoutProps = {
   sidebar: React.ReactNode;
@@ -26,12 +27,13 @@ export default function TwoColumnLayout({
             {sidebar}
           </div>
         </div>
-        {/* メインコンテンツ: バナー + コンテンツ */}
-        <main className="flex-1 min-w-0">
+        {/* メインコンテンツ: バナー + コンテンツ + フッター */}
+        <main className="flex-1 min-w-0 flex flex-col">
           {headerBanner}
-          <div className="px-6">
+          <div className="px-6 flex-1">
             <div className="max-w-[1440px] mx-auto">{children}</div>
           </div>
+          <Footer />
         </main>
       </div>
     </div>
