@@ -26,7 +26,7 @@ export default function Footer() {
         {/* Social Icons */}
         <div className="flex justify-center gap-0 mb-6">
           <a
-            href="https://x.com/techbowl"
+            href="https://x.com/TechBowl1"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-300 hover:text-white transition-colors"
