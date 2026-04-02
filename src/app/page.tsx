@@ -4,6 +4,8 @@ import {
   HomeContentLayout,
   TicketInfo,
   NotificationList,
+  ServiceSection,
+  EventSection,
 } from "@/components/Home";
 
 export default function Home() {
@@ -43,14 +45,10 @@ export default function Home() {
               </section>
 
               {/* イベント・キャンペーン */}
-              <section className="rounded-xl border border-brand-primary bg-white p-5">
-                <p className="text-sm text-text-description">イベント・キャンペーン（実装予定）</p>
-              </section>
+              <EventSection />
 
               {/* 機能・サービス */}
-              <section className="rounded-xl border border-brand-primary bg-white p-5">
-                <p className="text-sm text-text-description">機能・サービス（実装予定）</p>
-              </section>
+              <ServiceSection />
             </>
           }
           sideContent={

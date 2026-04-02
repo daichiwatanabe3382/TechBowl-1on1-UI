@@ -1,82 +1,81 @@
-import { TerminalBoxIcon, ArticleIcon, ChatIcon, ScalesIcon } from "@/components/icons";
+import {
+  ChatIcon,
+  BriefcaseIcon,
+  TerminalBoxIcon,
+  ArticleIcon,
+  ArrowRightIcon,
+} from "@/components/icons";
 
 type Service = {
-  id: string;
+  icon: React.ReactNode;
   name: string;
   description: string;
-  icon: React.ReactNode;
-  iconColor: string;
+  buttonLabel: string;
+  href: string;
 };
 
 const services: Service[] = [
   {
-    id: "1",
-    name: "実践問題集",
-    description: "実務レベルの問題でスキルを磨く",
-    icon: <TerminalBoxIcon size={24} />,
-    iconColor: "#FF6B6B",
+    icon: <ChatIcon size={20} />,
+    name: "1on1",
+    description:
+      "メンターとのディスカッションで思考力を深めたり、キャリアについてアドバイスを受ける",
+    buttonLabel: "予約する",
+    href: "/1on1",
   },
   {
-    id: "2",
-    name: "テックメディア",
-    description: "最新技術トレンドの情報配信",
-    icon: <ArticleIcon size={24} />,
-    iconColor: "#4ECDC4",
+    icon: <BriefcaseIcon size={20} />,
+    name: "スカウト",
+    description:
+      "意欲変更やプロフィールを充実させて、企業からのスカウトを受けとる",
+    buttonLabel: "確認する",
+    href: "/scout",
   },
   {
-    id: "3",
-    name: "メンターマッチング",
-    description: "専門家との1on1相談サポート",
-    icon: <ChatIcon size={24} />,
-    iconColor: "#FFD93D",
+    icon: <TerminalBoxIcon size={20} />,
+    name: "学ぶ",
+    description:
+      "実務に即した問題集に挑戦して、基礎的なエンジニアリング力を身につける",
+    buttonLabel: "挑戦する",
+    href: "/learn",
   },
   {
-    id: "4",
-    name: "キャリア相談",
-    description: "キャリアプランニング支援",
-    icon: <ScalesIcon size={24} />,
-    iconColor: "#A78BFA",
+    icon: <ArticleIcon size={20} />,
+    name: "メディア",
+    description:
+      "メンターの経験談や現場でしか得られない知見が集約されている記事を読み知識をつける",
+    buttonLabel: "閲覧する",
+    href: "/media",
   },
 ];
 
 export default function ServiceSection() {
   return (
-    <section>
-      {/* Section Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-bold text-text-body">機能・サービス</h2>
-      </div>
+    <section className="mb-16">
+      <h2 className="text-base font-bold text-text-body mb-3">
+        機能・サービス
+      </h2>
 
-      {/* Services Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-2">
         {services.map((service) => (
           <a
-            key={service.id}
-            href="#"
-            className="group rounded-xl border border-brand-primary bg-white p-4 hover:border-opacity-80 hover:shadow-md transition-all"
+            key={service.name}
+            href={service.href}
+            className="flex flex-col border border-border-secondary rounded bg-white p-6 hover:shadow-sm transition-shadow"
           >
-            {/* Icon Circle */}
-            <div
-              className="relative w-12 h-12 rounded-lg flex items-center justify-center mb-3 transition-transform group-hover:scale-110 overflow-hidden"
-            >
-              <div
-                className="absolute inset-0 opacity-15"
-                style={{ backgroundColor: service.iconColor }}
-              />
-              <div className="relative" style={{ color: service.iconColor }}>
-                {service.icon}
-              </div>
-            </div>
-
-            {/* Service Name */}
-            <h3 className="text-sm font-bold text-text-body mb-1 group-hover:text-brand-primary transition-colors">
+            <div className="text-text-body mb-2">{service.icon}</div>
+            <h3 className="text-base font-bold text-text-body mb-2">
               {service.name}
             </h3>
-
-            {/* Service Description */}
-            <p className="text-xs text-text-description line-clamp-2">
+            <p className="text-xs text-text-description leading-[1.25] mb-3 flex-1">
               {service.description}
             </p>
+            <div>
+              <span className="inline-flex items-center gap-1 bg-[#3d3d5c] text-white text-xs font-medium rounded-full px-3 py-2">
+                {service.buttonLabel}
+                <ArrowRightIcon size={14} />
+              </span>
+            </div>
           </a>
         ))}
       </div>

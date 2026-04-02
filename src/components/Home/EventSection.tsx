@@ -1,99 +1,54 @@
-import ActionButton from "@/components/ActionButton";
-import { CalendarEventIcon } from "@/components/icons";
-
-type Event = {
-  id: string;
-  category: "キャンペーン" | "イベント";
-  title: string;
-  dateRange: string;
-  description: string;
-};
-
-const events: Event[] = [
-  {
-    id: "1",
-    category: "キャンペーン",
-    title: "春の新規入会特別キャンペーン",
-    dateRange: "2026.04.01 - 2026.04.30",
-    description:
-      "新規入会者限定で初月50%オフ＆ボーナスチケット3枚プレゼント！",
-  },
-  {
-    id: "2",
-    category: "イベント",
-    title: "技術トレンド勉強会「Web3の今」",
-    dateRange: "2026.04.25 (木) 19:00-20:30",
-    description:
-      "業界の第一人者によるWeb3の最新動向と実践的な学習方法についてのセミナー。",
-  },
-];
-
-const categoryColors: Record<Event["category"], { bg: string; text: string }> =
-  {
-    キャンペーン: { bg: "#FFE4B5", text: "#FF8C00" },
-    イベント: { bg: "#ADD8E6", text: "#0066CC" },
-  };
+import { ArrowRightIcon } from "@/components/icons";
 
 export default function EventSection() {
   return (
     <section>
-      {/* Section Header */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-base font-bold text-text-body">
           イベント・キャンペーン
         </h2>
-        <ActionButton href="#">すべて見る</ActionButton>
+        <a
+          href="#"
+          className="inline-flex items-center gap-1 bg-[#3d3d5c] text-white text-xs font-medium rounded-full px-3 py-2"
+        >
+          一覧を見る
+          <ArrowRightIcon size={14} />
+        </a>
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        {events.map((event) => {
-          const colors = categoryColors[event.category];
-          return (
-            <a
-              key={event.id}
-              href="#"
-              className="group rounded-xl border border-brand-primary bg-white p-4 hover:border-opacity-80 hover:shadow-md transition-all"
+      <div className="grid grid-cols-3 gap-3">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="aspect-video rounded-lg bg-[#e8e5f0] flex items-center justify-center"
+          >
+            <svg
+              width={24}
+              height={24}
+              viewBox="0 0 24 24"
+              fill="none"
+              className="text-[#c4c0d0]"
             >
-              {/* Category Tag */}
-              <div className="flex items-center gap-2 mb-2">
-                <CalendarEventIcon
-                  size={14}
-                  className="text-text-body opacity-60"
-                />
-                <span
-                  className="inline-flex px-2 py-1 rounded-full text-xs font-bold"
-                  style={{ backgroundColor: colors.bg, color: colors.text }}
-                >
-                  {event.category}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h3 className="text-sm font-bold text-text-body mb-2 line-clamp-2 group-hover:underline group-hover:text-brand-primary transition-colors">
-                {event.title}
-              </h3>
-
-              {/* Date Range */}
-              <p className="text-xs text-text-description mb-2">
-                {event.dateRange}
-              </p>
-
-              {/* Description */}
-              <p className="text-xs text-text-body line-clamp-2 mb-3">
-                {event.description}
-              </p>
-
-              {/* Action Link */}
-              <a
-                href="#"
-                className="inline-flex text-xs font-bold text-brand-primary hover:underline transition-colors"
-              >
-                参加する →
-              </a>
-            </a>
-          );
-        })}
+              <rect
+                x="3"
+                y="3"
+                width="18"
+                height="18"
+                rx="2"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M3 16l5-5 4 4 3-3 6 6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+            </svg>
+          </div>
+        ))}
       </div>
     </section>
   );
