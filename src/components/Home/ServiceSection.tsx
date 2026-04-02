@@ -1,7 +1,7 @@
 import {
   ChatIcon,
   BriefcaseIcon,
-  TerminalBoxIcon,
+  GraduationCapIcon,
   ArticleIcon,
   ArrowRightIcon,
 } from "@/components/icons";
@@ -32,7 +32,7 @@ const services: Service[] = [
     href: "/scout",
   },
   {
-    icon: <TerminalBoxIcon size={20} />,
+    icon: <GraduationCapIcon size={20} />,
     name: "学ぶ",
     description:
       "実務に即した問題集に挑戦して、基礎的なエンジニアリング力を身につける",

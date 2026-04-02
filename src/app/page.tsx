@@ -6,6 +6,7 @@ import {
   NotificationList,
   ServiceSection,
   EventSection,
+  DailyQuestion,
 } from "@/components/Home";
 
 export default function Home() {
@@ -54,9 +55,7 @@ export default function Home() {
           sideContent={
             <>
               {/* 今日の1問 */}
-              <section className="rounded-xl border border-brand-primary bg-white p-5">
-                <p className="text-sm text-text-description">今日の1問（実装予定）</p>
-              </section>
+              <DailyQuestion />
 
               {/* プロフィール完成度 */}
               <section className="rounded-xl border border-brand-primary bg-white p-5">
