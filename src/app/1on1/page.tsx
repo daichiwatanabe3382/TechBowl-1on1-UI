@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { TwoColumnLayout } from "@/components/Layout";
 import SidebarButton from "@/components/SidebarButton";
@@ -43,6 +43,14 @@ const sidebarItems = [
 const validTabs = ["reserve", "manage", "feedback", "ticket"] as const;
 
 export default function OneOnOnePage() {
+  return (
+    <Suspense fallback={null}>
+      <OneOnOnePageContent />
+    </Suspense>
+  );
+}
+
+function OneOnOnePageContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const initialTab = validTabs.includes(tabParam as (typeof validTabs)[number]) ? tabParam! : "reserve";
