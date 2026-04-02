@@ -658,20 +658,12 @@ function CategoryGrid() {
 }
 
 export default function TopicList() {
-  const [viewMode, setViewMode] = useState<ViewMode>("timeline");
-
   return (
     <div>
-      <ViewToggle viewMode={viewMode} onChange={setViewMode} />
-      <p className="text-sm text-text-description mt-4 mb-6">
+      <p className="text-sm text-text-description mb-6">
         メンターの著書や技術発信について気になることを聞いてみよう
       </p>
-
-      {viewMode === "timeline" ? (
-        <UnifiedTimeline />
-      ) : (
-        <CategoryGrid />
-      )}
+      <CategoryGrid />
     </div>
   );
 }

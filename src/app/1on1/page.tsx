@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { TwoColumnLayout } from "@/components/Layout";
 import SidebarButton from "@/components/SidebarButton";
-import { ReservePage } from "@/components/1on1";
+import { ReservePage, TicketPage } from "@/components/1on1";
 import {
   CalendarEventIcon,
   ListUnorderedIcon,
@@ -85,13 +85,7 @@ export default function OneOnOnePage() {
             </h2>
           </div>
         )}
-        {activeItem === "ticket" && (
-          <div>
-            <h2 className="text-xl font-bold text-text-body">
-              チケットを増やす
-            </h2>
-          </div>
-        )}
+        {activeItem === "ticket" && <TicketPage />}
       </div>
     </TwoColumnLayout>
   );

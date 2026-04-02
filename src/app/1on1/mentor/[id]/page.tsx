@@ -189,7 +189,7 @@ export default function MentorDetailPage() {
 
         {/* Reserve CTA */}
         <button className="w-full mt-6 py-3 px-6 bg-brand-primary text-white font-bold rounded-lg hover:opacity-90 transition-opacity">
-          このメンターに1on1を予約する
+          このメンターに相談する
         </button>
 
         {/* Tabs */}

@@ -227,14 +227,13 @@ export function PastConsultationCard({ consultation }: { consultation: PastConsu
             <img src={consultation.mentorAvatar} alt={consultation.mentorName} className="object-cover w-full h-full" />
           </div>
           <span className="text-xs font-medium text-text-body">{consultation.mentorName}</span>
-          <span className="text-[10px] text-brand-primary bg-bg-quaternary px-1.5 py-0.5 rounded">{consultation.categoryLabel}</span>
           <span className="text-[10px] text-text-description">{consultation.date}</span>
         </div>
         <a
           href="/1on1/mentor/demo"
           className="text-xs font-bold text-brand-primary hover:underline shrink-0"
         >
-          同じ悩みで相談する →
+          相談してみる →
         </a>
       </div>
     </div>
@@ -243,7 +242,7 @@ export function PastConsultationCard({ consultation }: { consultation: PastConsu
 
 // ── フィルターに合致するメンターを計算 ──
 
-const DISPLAY_COUNT = 8;
+const DISPLAY_COUNT = 3;
 
 function useFilteredMentors(
   selectedCategory: string | null,
