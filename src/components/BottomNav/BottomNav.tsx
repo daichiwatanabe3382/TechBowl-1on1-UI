@@ -22,7 +22,7 @@ const navItems = [
 
 export default function BottomNav({ activeNav }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-bg-primary border-t border-border-primary pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-bg-primary border-t border-border-primary pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center justify-around h-14">
         {navItems.map((item) => {
           const isActive = activeNav === item.label;

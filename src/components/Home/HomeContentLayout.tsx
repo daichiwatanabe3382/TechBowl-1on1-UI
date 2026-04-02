@@ -15,12 +15,12 @@ export default function HomeContentLayout({
   sideContent,
 }: HomeContentLayoutProps) {
   return (
-    <div className="mx-4 mt-6 flex gap-6">
+    <div className="mx-3 lg:mx-4 mt-4 lg:mt-6 flex flex-col lg:flex-row gap-4 lg:gap-6">
       {/* Main Column */}
-      <div className="flex-1 min-w-0 flex flex-col gap-6">{mainContent}</div>
+      <div className="flex-1 min-w-0 flex flex-col gap-4 lg:gap-6">{mainContent}</div>
 
       {/* Sidebar */}
-      <div className="w-[320px] shrink-0 flex flex-col gap-6">{sideContent}</div>
+      <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-4 lg:gap-6">{sideContent}</div>
     </div>
   );
 }

@@ -20,7 +20,7 @@ export default function BaseLayout({
     <div className="flex flex-col min-h-screen bg-white">
       <Header activeNav={activeNav} ticketCount={ticketCount} />
       {headerBanner}
-      <main className="flex flex-1 justify-center w-full pb-14 md:pb-0">{children}</main>
+      <main className="flex flex-1 justify-center w-full pb-14 lg:pb-0">{children}</main>
       <Footer />
       <BottomNav activeNav={activeNav} />
     </div>

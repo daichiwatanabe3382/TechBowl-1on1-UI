@@ -620,13 +620,13 @@ function CategoryGrid() {
   return (
     <div>
       {/* Category filter tags */}
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex gap-2 mb-5 overflow-x-auto whitespace-nowrap pb-1">
         {categoryFilters.map((cat) => (
           <button
             key={cat}
             type="button"
             onClick={() => handleCategoryChange(cat)}
-            className={`px-3.5 py-1.5 text-sm font-medium rounded-full border transition-colors cursor-pointer ${
+            className={`shrink-0 px-3.5 py-1.5 text-sm font-medium rounded-full border transition-colors cursor-pointer ${
               activeCategory === cat
                 ? "bg-brand-primary text-white border-brand-primary"
                 : "bg-white text-text-secondary border-border-secondary hover:border-brand-primary hover:text-brand-primary"
@@ -638,7 +638,7 @@ function CategoryGrid() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
         {visible.map((content) => (
           <TopicCard key={content.id} content={content} />
         ))}

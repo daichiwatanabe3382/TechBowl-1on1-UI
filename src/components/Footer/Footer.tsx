@@ -9,14 +9,14 @@ const footerLinks = [
 export default function Footer() {
   return (
     <footer className="bg-[#171722] text-white w-full">
-      <div className="max-w-[1440px] mx-auto px-4 md:px-6 py-6 md:py-8">
+      <div className="max-w-[1440px] mx-auto px-4 lg:px-6 py-5 lg:py-8">
         {/* Links */}
-        <nav className="flex flex-wrap justify-center gap-3 md:gap-6 mb-4 md:mb-6">
+        <nav className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 lg:gap-6 mb-3 lg:mb-6">
           {footerLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-sm text-gray-300 hover:text-white transition-colors"
+              className="text-xs lg:text-sm text-gray-300 hover:text-white transition-colors"
             >
               {link.label}
             </a>
@@ -24,7 +24,7 @@ export default function Footer() {
         </nav>
 
         {/* Social Icons */}
-        <div className="flex justify-center gap-0 mb-6">
+        <div className="flex justify-center gap-0 mb-4 lg:mb-6">
           <a
             href="https://x.com/TechBowl1"
             target="_blank"
@@ -32,7 +32,7 @@ export default function Footer() {
             className="text-gray-300 hover:text-white transition-colors"
             aria-label="X (Twitter)"
           >
-            <img src="/image/X.svg" alt="X" width={32} height={32} />
+            <img src="/image/X.svg" alt="X" width={28} height={28} className="lg:w-8 lg:h-8" />
           </a>
           <a
             href="https://note.com/techbowl"
@@ -41,15 +41,15 @@ export default function Footer() {
             className="text-gray-300 hover:text-white transition-colors"
             aria-label="note"
           >
-            <img src="/image/note.svg" alt="note" width={32} height={32} />
+            <img src="/image/note.svg" alt="note" width={28} height={28} className="lg:w-8 lg:h-8" />
           </a>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-600 mb-6" />
+        <div className="border-t border-gray-600 mb-4 lg:mb-6" />
 
         {/* Copyright */}
-        <p className="text-center text-sm text-gray-400">
+        <p className="text-center text-xs lg:text-sm text-gray-400">
           © TechBowl Inc. All Rights Reserved.
         </p>
       </div>

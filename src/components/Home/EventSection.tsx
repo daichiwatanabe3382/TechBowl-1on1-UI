@@ -16,11 +16,11 @@ export default function EventSection() {
         </a>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="flex gap-3 overflow-x-auto pb-1 lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="aspect-video rounded-lg bg-[#e8e5f0] flex items-center justify-center"
+            className="shrink-0 w-[70%] lg:w-auto aspect-video rounded-lg bg-[#e8e5f0] flex items-center justify-center"
           >
             <svg
               width={24}

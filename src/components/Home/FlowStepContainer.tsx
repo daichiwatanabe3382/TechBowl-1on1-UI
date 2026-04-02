@@ -33,17 +33,17 @@ const flowSteps: FlowStep[] = [
 
 export default function FlowStepContainer() {
   return (
-    <section className="mx-4 mt-10">
-      <div className="rounded-2xl border-2 border-brand-primary bg-white p-6">
+    <section className="mx-3 lg:mx-4 mt-6 lg:mt-10">
+      <div className="rounded-2xl border-2 border-brand-primary bg-white p-4 lg:p-6">
         {/* Heading */}
-        <div className="flex flex-col items-center gap-2 mb-6">
+        <div className="flex flex-col items-center gap-2 mb-4 lg:mb-6">
           <div className="flex items-center gap-2">
             <img
               src="/image/home/puru-image.png"
               alt=""
               className="w-9 h-8 object-contain"
             />
-            <h2 className="text-xl font-bold text-text-body">
+            <h2 className="text-lg lg:text-xl font-bold text-text-body">
               TechTrainへようこそ
             </h2>
             <img
@@ -58,13 +58,13 @@ export default function FlowStepContainer() {
         </div>
 
         {/* Flow Steps */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4 lg:mb-6">
           {flowSteps.map((step) => (
             <div key={step.title} className="flex gap-3 items-start min-w-0">
               <img
                 src={step.image}
                 alt={step.title}
-                className="w-2/5 aspect-[208/120] rounded-lg object-cover shrink-0 border-2"
+                className="w-1/4 lg:w-2/5 aspect-[208/120] rounded-lg object-cover shrink-0 border-2"
                 style={{ borderColor: step.borderColor }}
               />
               <div className="flex flex-col gap-1 pt-1 min-w-0">
@@ -80,7 +80,7 @@ export default function FlowStepContainer() {
         </div>
 
         {/* Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-center lg:justify-end">
           <ActionButton href="#">使い方ガイド</ActionButton>
         </div>
       </div>

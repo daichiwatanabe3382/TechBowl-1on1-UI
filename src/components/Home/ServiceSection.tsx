@@ -56,12 +56,12 @@ export default function ServiceSection() {
         機能・サービス
       </h2>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
         {services.map((service) => (
           <a
             key={service.name}
             href={service.href}
-            className="flex flex-col border border-border-secondary rounded bg-white p-6 hover:shadow-sm transition-shadow"
+            className="flex flex-col border border-border-secondary rounded bg-white p-4 lg:p-6 hover:shadow-sm transition-shadow"
           >
             <div className="text-text-body mb-2">{service.icon}</div>
             <h3 className="text-base font-bold text-text-body mb-2">

@@ -33,7 +33,7 @@ const navItems: NavItem[] = [
 
 export default function Header({ ticketCount = 4, activeNav }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 flex items-center gap-2 md:gap-4 bg-bg-primary border-b border-border-primary px-3 md:pl-4 md:pr-6 py-3 w-full">
+    <header className="sticky top-0 z-50 flex items-center gap-2 lg:gap-4 bg-bg-primary border-b border-border-primary px-3 lg:pl-4 lg:pr-6 py-3 w-full overflow-hidden">
       {/* Logo */}
       <div className="shrink-0">
         <img
@@ -45,10 +45,10 @@ export default function Header({ ticketCount = 4, activeNav }: HeaderProps) {
       </div>
 
       {/* Spacer for mobile */}
-      <div className="flex-1 md:hidden" />
+      <div className="flex-1 lg:hidden" />
 
       {/* Navigation (desktop only) */}
-      <nav className="hidden md:flex flex-1 gap-2 items-center">
+      <nav className="hidden lg:flex flex-1 min-w-0 gap-2 items-center whitespace-nowrap">
         {navItems.map((item) => {
           const isActive = activeNav === item.label;
           return (
@@ -85,7 +85,7 @@ export default function Header({ ticketCount = 4, activeNav }: HeaderProps) {
             {ticketCount}
           </span>
         </div>
-        <div className="hidden md:flex items-center gap-1 px-3 h-9 bg-bg-tertiary">
+        <div className="hidden lg:flex items-center gap-1 px-3 h-9 bg-bg-tertiary">
           <span className="text-sm font-bold text-text-description">追加</span>
           <AddIcon size={16} className="text-text-description" />
         </div>

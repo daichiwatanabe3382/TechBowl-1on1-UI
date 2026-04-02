@@ -88,11 +88,11 @@ export default function MentorDetailPage() {
     <TwoColumnLayout
       activeNav="1on1"
       headerBanner={
-        <div className="w-full h-[140px] overflow-hidden">
+        <div className="w-full overflow-hidden">
           <img
             src="/image/1on1/headerbanner-1on1.png"
             alt="1on1 - メンターと話しながら技術やキャリアについて思考を深めよう"
-            className="w-full h-full object-cover"
+            className="w-full h-[80px] object-cover lg:h-auto lg:object-contain"
           />
         </div>
       }

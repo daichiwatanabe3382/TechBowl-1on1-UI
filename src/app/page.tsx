@@ -13,11 +13,11 @@ export default function Home() {
     <BaseLayout
       activeNav="マイページ"
       headerBanner={
-        <div className="w-full h-[140px] overflow-hidden">
+        <div className="w-full overflow-hidden">
           <img
             src="/image/home/mypage.jpg?v=4"
             alt="あなただけの魅力や差別化要素を発見しよう"
-            className="w-full h-full object-cover"
+            className="w-full h-[80px] object-cover lg:h-auto lg:object-contain"
           />
         </div>
       }

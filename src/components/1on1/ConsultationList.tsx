@@ -394,26 +394,26 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
         <p className="text-xs text-text-description mb-4">
           気になるテーマをタップすると、対応できるメンターが見つかります
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
               type="button"
               onClick={() => toggleCategory(cat.id)}
-              className={`flex items-center gap-2.5 rounded-lg px-3 py-3 transition-all cursor-pointer text-left border group ${
+              className={`flex items-center gap-2 rounded-lg px-2.5 py-2 transition-all cursor-pointer text-left border group ${
                 selectedCategory === cat.id
                   ? "bg-brand-primary/5 border-brand-primary"
                   : "bg-white border-border-primary hover:border-brand-primary hover:shadow-sm"
               }`}
             >
-              <span className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+              <span className={`flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md text-xs transition-colors ${
                 selectedCategory === cat.id
                   ? "bg-brand-primary text-white"
                   : "bg-bg-quaternary text-brand-primary group-hover:bg-brand-primary group-hover:text-white"
               }`}>
                 {cat.icon}
               </span>
-              <span className={`flex-1 text-sm font-bold transition-colors ${
+              <span className={`flex-1 text-xs font-bold transition-colors ${
                 selectedCategory === cat.id ? "text-brand-primary" : "text-text-body group-hover:text-brand-primary"
               }`}>{cat.title}</span>
             </button>
@@ -426,7 +426,7 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
             <span className="text-xs font-bold text-text-description">今みんなが話してること</span>
             <span className="text-[10px] text-text-description bg-bg-quaternary px-1.5 py-0.5 rounded">🔥 トレンド</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {trendingTopics.map((topic) => (
               <button
                 key={topic.label}
@@ -436,7 +436,7 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
                   setSelectedCategory(null); // トレンド選択でカテゴリ解除
                   setShowAllMentors(false);
                 }}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
                   selectedTrend === topic.label
                     ? "bg-brand-primary text-white border-brand-primary"
                     : "bg-bg-secondary text-text-body border-border-primary hover:bg-brand-primary/5 hover:border-brand-primary hover:text-brand-primary"
@@ -540,7 +540,7 @@ export default function ConsultationList({ onNavigateToMentors }: { onNavigateTo
                 ? `「${categories.find((c) => c.id === selectedCategory)?.title}」に対応できるメンター`
                 : "対応できるメンター"}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
               {filteredMentors.map((mentor) => (
                 <MentorCard key={mentor.name} {...mentor} />
               ))}
