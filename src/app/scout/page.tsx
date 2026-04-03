@@ -14,7 +14,7 @@ export default function ScoutPage() {
         </div>
       }
     >
-      <div className="w-full max-w-[1440px] px-6 py-8">
+      <div className="w-full max-w-[1440px] mx-auto px-6 py-8">
         <h1 className="text-2xl font-bold text-text-body mb-6">スカウト</h1>
 
         <div className="grid gap-6">

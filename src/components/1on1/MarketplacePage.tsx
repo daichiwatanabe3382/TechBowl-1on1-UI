@@ -341,7 +341,7 @@ export default function MarketplacePage() {
         />
       </div>
       {/* メニューバー */}
-      <div className="border-b border-border-primary bg-white sticky top-[61px] lg:top-[65px] z-30">
+      <div className="w-full border-b border-border-primary bg-white sticky top-[61px] lg:top-[65px] z-30">
           <div className="max-w-[1440px] mx-auto px-3 lg:px-6">
             <div className="flex overflow-x-auto">
               {menuItems.map((item) => {
@@ -369,11 +369,11 @@ export default function MarketplacePage() {
 
         {/* メインコンテンツ */}
         {activeMenu === "ticket" ? (
-          <div className="max-w-[1440px] mx-auto px-3 lg:px-6 py-5 lg:py-8">
+          <div className="w-full max-w-[1440px] mx-auto px-3 lg:px-6 py-5 lg:py-8">
             <TicketPage />
           </div>
         ) : (
-        <div className="max-w-[1440px] mx-auto px-3 lg:px-6 py-5 lg:py-8">
+        <div className="w-full max-w-[1440px] mx-auto px-3 lg:px-6 py-5 lg:py-8">
           {/* 探し方タブ（サイドバーの上に配置） */}
           <section className="mb-6">
             <h2 className="text-xl font-bold text-text-body mb-4">メンターを探して1on1予約</h2>
