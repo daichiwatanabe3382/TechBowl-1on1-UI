@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { TwoColumnLayout } from "@/components/Layout";
 import SidebarButton from "@/components/SidebarButton";
 import { ReservePage, TicketPage } from "@/components/1on1";
+import MarketplacePage from "@/components/1on1/MarketplacePage";
 import {
   CalendarEventIcon,
   ListUnorderedIcon,
@@ -12,6 +13,8 @@ import {
   CouponLineIcon,
   TicketIcon,
 } from "@/components/icons";
+
+type LayoutPattern = "A" | "B";
 
 const sidebarItems = [
   {
@@ -49,6 +52,21 @@ const mobileLabels: Record<string, string> = {
 
 const validTabs = ["reserve", "manage", "feedback", "ticket"] as const;
 
+function LayoutToggle({ pattern, onChange }: { pattern: LayoutPattern; onChange: (p: LayoutPattern) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(pattern === "A" ? "B" : "A")}
+      className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-50 flex items-center gap-2 px-4 py-2.5 bg-brand-primary text-white text-sm font-bold rounded-full shadow-lg hover:opacity-90 transition-opacity cursor-pointer"
+    >
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+      </svg>
+      Pattern {pattern === "A" ? "B" : "A"} に切替
+    </button>
+  );
+}
+
 export default function OneOnOnePage() {
   return (
     <Suspense fallback={null}>
@@ -63,7 +81,32 @@ function OneOnOnePageContent() {
   const initialTab = validTabs.includes(tabParam as (typeof validTabs)[number]) ? tabParam! : "reserve";
   const [activeItem, setActiveItem] = useState(initialTab);
 
+  const layoutParam = searchParams.get("layout");
+  const [layoutPattern, setLayoutPattern] = useState<LayoutPattern>(
+    layoutParam === "B" ? "B" : "A"
+  );
+  useEffect(() => {
+    if (layoutParam === "A" || layoutParam === "B") return; // URLパラメータ優先
+    const saved = localStorage.getItem("1on1-layout-pattern");
+    if (saved === "A" || saved === "B") setLayoutPattern(saved);
+  }, [layoutParam]);
+  const handlePatternChange = (p: LayoutPattern) => {
+    setLayoutPattern(p);
+    localStorage.setItem("1on1-layout-pattern", p);
+  };
+
+  if (layoutPattern === "B") {
+    return (
+      <>
+        <MarketplacePage />
+        <LayoutToggle pattern={layoutPattern} onChange={handlePatternChange} />
+      </>
+    );
+  }
+
   return (
+    <>
+    <LayoutToggle pattern={layoutPattern} onChange={handlePatternChange} />
     <TwoColumnLayout
       activeNav="1on1"
       headerBanner={
@@ -131,5 +174,6 @@ function OneOnOnePageContent() {
         {activeItem === "ticket" && <TicketPage />}
       </div>
     </TwoColumnLayout>
+    </>
   );
 }

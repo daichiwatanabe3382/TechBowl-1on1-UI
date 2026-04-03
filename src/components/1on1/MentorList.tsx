@@ -64,12 +64,19 @@ export const mentors = [
   { name: "Shinjiro Echizen", company: "大手IT", level: "Rank3以上" as const, englishOk: false, skills: ["Java", "DDD", "マイクロサービス"], catchphrase: "設計って奥が深い。一緒に考えましょう", avatarUrl: "https://techbowl.s3.ap-northeast-1.amazonaws.com/mentor-profile-image/00fb156d5b52c2a08e7f8874bf0c6013.jpg", availability: "available" as const, recentTopics: ["DDD相談", "コードレビュー"] },
 ];
 
-export default function MentorList() {
+export default function MentorList({ initialFilter, initialLevel, onFilterChange }: { initialFilter?: string | null; initialLevel?: string | null; onFilterChange?: (filter: string) => void } = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string>("すべて");
-  const [activeSort, setActiveSort] = useState<string>("おすすめ順");
+  const [activeFilter, setActiveFilter] = useState<string>(initialFilter ?? "すべて");
+  const [activeSort, setActiveSort] = useState<string>(
+    initialLevel === "beginner" ? "初心者OK順" : initialLevel === "english" ? "English OK順" : "おすすめ順"
+  );
+
+  const handleFilterChange = (filter: string) => {
+    setActiveFilter(filter);
+    onFilterChange?.(filter);
+  };
 
   const availabilityOrder = { available: 0, few: 1, full: 2 } as const;
 
@@ -82,7 +89,12 @@ export default function MentorList() {
       const matchesFilter =
         activeFilter === "すべて" ||
         m.skills.some((t) => t.toLowerCase() === activeFilter.toLowerCase());
-      return matchesSearch && matchesFilter;
+      const matchesLevel =
+        !initialLevel ||
+        (initialLevel === "beginner" && m.level === "初心者OK") ||
+        (initialLevel === "advanced" && m.level === "Rank3以上") ||
+        (initialLevel === "english" && m.englishOk);
+      return matchesSearch && matchesFilter && matchesLevel;
     })
     .sort((a, b) => availabilityOrder[a.availability] - availabilityOrder[b.availability]);
 
@@ -119,7 +131,7 @@ export default function MentorList() {
                   <button
                     key={opt}
                     type="button"
-                    onClick={() => { setActiveFilter(opt); setFilterOpen(false); }}
+                    onClick={() => { handleFilterChange(opt); setFilterOpen(false); }}
                     className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
                       activeFilter === opt
                         ? "text-brand-primary font-bold bg-bg-quaternary"

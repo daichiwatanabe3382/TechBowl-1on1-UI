@@ -16,6 +16,7 @@ export type TopicContent = {
   summary?: string;
   updatedAt?: string;
   category?: string;
+  sourceUrl?: string;
 };
 
 const techArticles: TopicContent[] = [
@@ -30,6 +31,7 @@ const techArticles: TopicContent[] = [
     summary: "AIコーディングツールの台頭により、リポジトリ構成の考え方も変わりつつある。モノレポ・マルチレポそれぞれの利点を整理し、AI時代に適した設計指針を探る。",
     updatedAt: "2026-03-29",
     category: "技術記事",
+    sourceUrl: "https://note.com/example/ai-architecture-repo",
   },
   {
     id: "2",
@@ -42,6 +44,7 @@ const techArticles: TopicContent[] = [
     summary: "try-catchによる例外処理とResult型を使ったエラー表現、それぞれの使い分けを実例をもとに解説。実務で安全なエラー設計を行うためのヒント。",
     updatedAt: "2026-03-25",
     category: "技術記事",
+    sourceUrl: "https://techtrain.dev/example/result-type-error-handling",
   },
   {
     id: "3",
@@ -54,6 +57,7 @@ const techArticles: TopicContent[] = [
     summary: "FlutterアプリでAPIトークンをセキュアに保存・更新する方法をflutter_secure_storageやRefresh Token戦略とともに紹介。",
     updatedAt: "2026-03-20",
     category: "技術記事",
+    sourceUrl: "https://zenn.dev/example/flutter-api-token",
   },
   {
     id: "4",
@@ -324,7 +328,7 @@ export function TopicCard({ content }: { content: TopicContent }) {
     <div className="group flex flex-col bg-white border border-border-primary rounded-xl overflow-hidden hover:border-brand-primary transition-colors text-left">
       {/* Card body — links to topic detail */}
       <a
-        href="/1on1/mentor/demo"
+        href={`/1on1/topic/${content.id}`}
         className="flex flex-col flex-1 cursor-pointer"
       >
         {/* Thumbnail */}
@@ -378,7 +382,7 @@ export function TopicCard({ content }: { content: TopicContent }) {
 
       {/* Mentor CTA - primary action to mentor detail */}
       <a
-        href="/1on1/mentor/demo"
+        href={`/1on1/topic/${content.id}`}
         className="flex flex-col gap-2 mt-auto border-t border-border-primary px-3 py-2.5 rounded-b-xl transition-colors hover:bg-brand-primary/5 group/mentor"
       >
         <div className="flex items-center gap-2">
@@ -424,7 +428,7 @@ export function formatDate(dateStr?: string) {
 }
 
 /** 全カテゴリ統合・更新日順のソート済みリスト */
-const allContents: TopicContent[] = [
+export const allContents: TopicContent[] = [
   ...techArticles,
   ...books,
   ...slides,
@@ -439,7 +443,7 @@ function TimelineCard({ content }: { content: TopicContent }) {
   return (
     <div className="bg-white border border-border-primary rounded-xl overflow-hidden hover:border-brand-primary transition-colors">
       <a
-        href="/1on1/mentor/demo"
+        href={`/1on1/topic/${content.id}`}
         className="flex gap-5 p-4 cursor-pointer"
       >
         {/* Thumbnail — 16:9 */}
@@ -499,7 +503,7 @@ function TimelineCard({ content }: { content: TopicContent }) {
       </a>
       {/* Mentor CTA - links to mentor detail */}
       <a
-        href="/1on1/mentor/demo"
+        href={`/1on1/topic/${content.id}`}
         className="flex items-center gap-3 px-4 py-2.5 border-t border-border-primary hover:bg-brand-primary/5 transition-colors group/mentor"
       >
         <div className="w-9 h-9 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">

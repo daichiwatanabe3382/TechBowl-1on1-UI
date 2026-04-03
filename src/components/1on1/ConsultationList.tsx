@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import MentorCard from "./MentorCard";
 import { mentors } from "./MentorList";
 import {
@@ -101,7 +101,7 @@ type PastConsultation = {
   date: string;
 };
 
-const pastConsultations: PastConsultation[] = [
+export const pastConsultations: PastConsultation[] = [
   {
     id: "1",
     before: "一覧画面の描画が遅くて原因がわからない",
@@ -208,7 +208,7 @@ function FilterTag({
 export { type PastConsultation };
 export function PastConsultationCard({ consultation }: { consultation: PastConsultation }) {
   return (
-    <div className="bg-white border border-border-primary rounded-xl p-4 hover:border-brand-primary transition-colors">
+    <div className="bg-white border border-border-primary rounded-xl p-4 hover:border-brand-primary transition-colors h-full flex flex-col">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-start gap-2">
           <span className="shrink-0 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full mt-0.5">悩み</span>
@@ -220,7 +220,7 @@ export function PastConsultationCard({ consultation }: { consultation: PastConsu
           <p className="text-sm font-bold text-brand-primary">{consultation.after}</p>
         </div>
       </div>
-      <p className="text-xs text-text-description leading-relaxed mt-2.5 line-clamp-2">{consultation.caption}</p>
+      <p className="text-xs text-text-description leading-relaxed mt-2.5 line-clamp-2 flex-1">{consultation.caption}</p>
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-primary">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">
@@ -330,15 +330,25 @@ function TabToggle({ tab, onChange }: { tab: ConsultationTab; onChange: (t: Cons
 
 // ── メインコンポーネント ──
 
-export default function ConsultationList({ onNavigateToMentors }: { onNavigateToMentors?: () => void }) {
+export default function ConsultationList({ onNavigateToMentors, initialCategory, initialTrend }: { onNavigateToMentors?: () => void; initialCategory?: string | null; initialTrend?: string | null }) {
   const [activeTab, setActiveTab] = useState<ConsultationTab>("find");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory ?? null);
   const [selectedProblems, setSelectedProblems] = useState<Set<string>>(new Set());
   const [selectedTech, setSelectedTech] = useState<Set<string>>(new Set());
-  const [selectedTrend, setSelectedTrend] = useState<string | null>(null);
+  const [selectedTrend, setSelectedTrend] = useState<string | null>(initialTrend ?? null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [showAllMentors, setShowAllMentors] = useState(false);
   const [visibleConsultations, setVisibleConsultations] = useState(4);
+
+  // 外部からの初期値変更に追従
+  useEffect(() => {
+    setSelectedCategory(initialCategory ?? null);
+    if (initialCategory) setSelectedTrend(null);
+  }, [initialCategory]);
+  useEffect(() => {
+    setSelectedTrend(initialTrend ?? null);
+    if (initialTrend) setSelectedCategory(null);
+  }, [initialTrend]);
 
   const toggleCategory = (id: string) => {
     setSelectedCategory((prev) => (prev === id ? null : id));

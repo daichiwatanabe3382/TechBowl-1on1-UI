@@ -67,7 +67,7 @@ export default function MentorCard({
   return (
     <a
       href="/1on1/mentor/demo"
-      className="block p-4 rounded-lg border border-border-primary hover:border-brand-primary hover:bg-bg-secondary transition-colors cursor-pointer"
+      className="p-4 rounded-lg border border-border-primary hover:border-brand-primary hover:bg-bg-secondary transition-colors cursor-pointer h-full flex flex-col"
     >
       {/* Top: Avatar + Name + Availability */}
       <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export default function MentorCard({
       </div>
 
       {/* Specialty + Skills */}
-      <div className="flex flex-wrap items-center gap-1 mt-2">
+      <div className="flex flex-wrap items-center gap-1 mt-2 mt-auto pt-1">
         {skills.length > 0 && (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold text-brand-primary bg-brand-primary/8 border border-brand-primary/20 rounded-full">
             <svg width={10} height={10} viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
