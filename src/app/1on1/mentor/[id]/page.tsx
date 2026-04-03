@@ -1,26 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { TwoColumnLayout } from "@/components/Layout";
-import SidebarButton from "@/components/SidebarButton";
-import {
-  CalendarEventIcon,
-  ListUnorderedIcon,
-  ShareForwardIcon,
-  CouponLineIcon,
-  TicketIcon,
-} from "@/components/icons";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
 import { PastConsultationCard, type PastConsultation } from "@/components/1on1/ConsultationList";
-import { TopicCard, type TopicContent } from "@/components/1on1/TopicList";
-
-// --- Sidebar items (shared with other 1on1 pages) ---
-const sidebarItems = [
-  { id: "reserve", label: "1on1を予約", defaultIcon: <CalendarEventIcon size={18} filled={false} />, activeIcon: <CalendarEventIcon size={18} filled={true} /> },
-  { id: "manage", label: "1on1管理", defaultIcon: <ListUnorderedIcon size={18} />, activeIcon: <ListUnorderedIcon size={18} /> },
-  { id: "feedback", label: "フィードバック一覧", defaultIcon: <ShareForwardIcon size={18} filled={false} />, activeIcon: <ShareForwardIcon size={18} filled={true} /> },
-  { id: "ticket", label: "チケットを増やす", defaultIcon: <CouponLineIcon size={18} />, activeIcon: <TicketIcon size={18} /> },
-];
+import { type TopicContent } from "@/components/1on1/TopicList";
 
 // --- Mock mentor data ---
 const mentorData = {
@@ -45,10 +30,10 @@ const mentorData = {
     { id: "c2", before: "CI/CDのビルドが毎回10分以上かかって辛い", after: "キャッシュ戦略とステージ分割で3分に短縮", caption: "ボトルネックの特定方法から教えてもらい、自分でも改善を続けられるようになりました", categoryLabel: "業務で詰まっている", categoryId: "stuck", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.15" },
     { id: "c3", before: "GitHub Actionsのワークフロー、何が正解かわからない", after: "チーム規模に合った現実的な構成が決まった", caption: "理想と現実のバランスを考慮して提案してくれたのが助かりました", categoryLabel: "技術選定", categoryId: "tech-selection", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.10" },
   ] satisfies PastConsultation[],
-  reviews: [
-    { id: "1", userName: "ユーザーA", rating: 5, comment: "テスト設計について非常にわかりやすく教えていただけました。実務にすぐ活かせる内容でした。", date: "2026-03-20" },
-    { id: "2", userName: "ユーザーB", rating: 5, comment: "CI/CDの構築で悩んでいたところを的確にアドバイスしてもらえました。", date: "2026-03-15" },
-    { id: "3", userName: "ユーザーC", rating: 4, comment: "初心者の自分にも丁寧に説明してくれて、とても助かりました。次回もお願いしたいです。", date: "2026-03-10" },
+  careerHistory: [
+    { period: "2024 - 現在", company: "TechBowl Inc.", role: "ソフトウェアエンジニア", description: "テスト自動化基盤の設計・開発。CI/CDパイプラインの構築と運用改善をリード。OSSテストフレームワークのメンテナー。" },
+    { period: "2021 - 2024", company: "株式会社メルカリ", role: "QAエンジニア → SET（Software Engineer in Test）", description: "E2Eテスト基盤の構築、テスト戦略の策定。チームのテスト文化醸成に貢献。GitHub Actionsを活用したCI/CD改善。" },
+    { period: "2019 - 2021", company: "株式会社サイバーエージェント", role: "フロントエンドエンジニア", description: "React/TypeScriptでの新規プロダクト開発。コンポーネントテストの導入をリードし、チーム全体のテスト文化を定着。" },
   ],
   schedule: [
     { day: "月", slots: ["19:00", "20:00", "21:00"] },
@@ -67,228 +52,207 @@ const availabilityConfig = {
   full: { label: "いっぱい", colors: "text-[#6b7280] bg-[#f3f4f6] border-[#e5e7eb]" },
 };
 
-function StarRating({ rating }: { rating: number }) {
+// --- Section heading ---
+function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <svg key={i} width={16} height={16} viewBox="0 0 24 24" fill={i <= rating ? "#f59e0b" : "none"} stroke={i <= rating ? "#f59e0b" : "#d1d5db"} strokeWidth={2}>
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
-      ))}
-    </div>
+    <h2 className="text-lg font-bold text-text-body mb-4 flex items-center gap-2">
+      {children}
+    </h2>
   );
 }
 
 export default function MentorDetailPage() {
-  const [activeTab, setActiveTab] = useState<"about" | "topics" | "consultations" | "reviews">("about");
   const mentor = mentorData;
   const avail = availabilityConfig[mentor.availability];
 
   return (
-    <TwoColumnLayout
-      activeNav="1on1"
-      headerBanner={
-        <div className="w-full overflow-hidden">
-          <img
-            src="/image/1on1/headerbanner-1on1.png"
-            alt="1on1 - メンターと話しながら技術やキャリアについて思考を深めよう"
-            className="w-full h-[80px] object-cover lg:h-auto lg:object-contain"
-          />
-        </div>
-      }
-      sidebar={
-        <nav className="flex flex-col gap-1">
-          {sidebarItems.map((item) => {
-            const isActive = item.id === "reserve";
-            return (
-              <SidebarButton
-                key={item.id}
-                icon={isActive ? item.activeIcon : item.defaultIcon}
-                label={item.label}
-                isActive={isActive}
-                onClick={() => {}}
-              />
-            );
-          })}
-        </nav>
-      }
-    >
-      <div className="py-6 max-w-3xl">
+    <div className="flex flex-col min-h-screen bg-white">
+      <Header activeNav="1on1" />
+
+      {/* Main content */}
+      <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 lg:px-8 py-6 pb-24 lg:pb-8">
         {/* Back link */}
         <a href="/1on1" className="inline-flex items-center gap-1 text-sm text-text-description hover:text-brand-primary transition-colors mb-6">
           <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
             <path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z" />
           </svg>
-          戻る
+          メンター一覧に戻る
         </a>
 
-        {/* Profile header */}
-        <div className="flex items-start gap-5">
-          <div className="shrink-0 size-20 rounded-full overflow-hidden bg-bg-quaternary">
-            <Image src={mentor.avatarUrl} alt={mentor.name} width={80} height={80} className="size-full object-cover" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl font-bold text-text-body">{mentor.name}</h1>
-              <span className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full border ${avail.colors}`}>
+        {/* ── Hero: Profile + CTA ── */}
+        <div className="rounded-2xl border-2 border-[#3d3d5c] p-6 lg:p-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            {/* Left: Avatar */}
+            <div className="flex flex-col items-center lg:items-start gap-3">
+              <div className="shrink-0 size-24 lg:size-28 rounded-full overflow-hidden bg-bg-quaternary ring-4 ring-bg-quaternary">
+                <Image src={mentor.avatarUrl} alt={mentor.name} width={112} height={112} className="size-full object-cover" />
+              </div>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full border ${avail.colors}`}>
+                <span className="relative flex size-2">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${mentor.availability === "available" ? "bg-green-400" : mentor.availability === "few" ? "bg-orange-400" : "bg-gray-400"}`} />
+                  <span className={`relative inline-flex rounded-full size-2 ${mentor.availability === "available" ? "bg-green-500" : mentor.availability === "few" ? "bg-orange-500" : "bg-gray-500"}`} />
+                </span>
                 {avail.label}
               </span>
             </div>
-            <p className="text-sm text-text-description mt-1">{mentor.company} / {mentor.role}</p>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="flex items-center gap-1 text-xs">
-                <span className={`inline-block size-2 rounded-full ${mentor.level === "初心者OK" ? "bg-green-500" : "bg-red-500"}`} />
-                <span className={mentor.level === "初心者OK" ? "text-green-600" : "text-red-500"}>{mentor.level}</span>
-              </span>
-              {mentor.englishOk && (
-                <span className="flex items-center gap-1 text-xs">
-                  <span className="inline-block size-2 rounded-full bg-green-500" />
-                  <span className="text-green-600">English OK</span>
+
+            {/* Right: Info */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-text-body">{mentor.name}</h1>
+              <p className="text-sm text-text-description mt-1">{mentor.company} / {mentor.role}</p>
+
+              {/* Tags */}
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-full bg-green-50 text-green-700 border border-green-200">
+                  {mentor.level}
                 </span>
-              )}
-            </div>
-            {/* Skills */}
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {mentor.skills.map((skill) => (
-                <span key={skill} className="inline-block px-2 py-0.5 text-xs text-text-body bg-bg-quaternary rounded">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Catchphrase bubble */}
-        <div className="mt-4 relative">
-          <div className="absolute -top-1.5 left-8 w-3 h-3 bg-bg-quaternary rotate-45" />
-          <div className="px-4 py-3 bg-bg-quaternary rounded-lg relative">
-            <p className="text-sm text-brand-primary leading-relaxed">{mentor.catchphrase}</p>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mt-6 p-4 bg-bg-secondary rounded-xl border border-border-primary">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-text-body">{mentor.stats.totalSessions}</p>
-            <p className="text-xs text-text-description mt-0.5">累計セッション</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-text-body">{mentor.stats.repeatRate}%</p>
-            <p className="text-xs text-text-description mt-0.5">リピート率</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-1">
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="#f59e0b">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              <span className="text-2xl font-bold text-text-body">{mentor.stats.avgRating}</span>
-            </div>
-            <p className="text-xs text-text-description mt-0.5">平均評価</p>
-          </div>
-        </div>
-
-        {/* Reserve CTA */}
-        <button className="w-full mt-6 py-3 px-6 bg-brand-primary text-white font-bold rounded-lg hover:opacity-90 transition-opacity">
-          このメンターに相談する
-        </button>
-
-        {/* Tabs */}
-        <div className="flex border-b border-border-primary mt-8">
-          {([
-            { key: "about", label: "プロフィール" },
-            { key: "topics", label: "トピック" },
-            { key: "consultations", label: "相談履歴" },
-            { key: "reviews", label: "レビュー" },
-          ] as const).map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-5 py-3 text-sm font-medium transition-colors relative ${
-                activeTab === tab.key
-                  ? "text-brand-primary"
-                  : "text-text-description hover:text-text-body"
-              }`}
-            >
-              {tab.label}
-              {activeTab === tab.key && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-primary rounded-full" />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab content */}
-        <div className="mt-6">
-          {activeTab === "about" && (
-            <div className="space-y-6">
-              {/* Bio */}
-              <div>
-                <h2 className="text-base font-bold text-text-body mb-2">自己紹介</h2>
-                <p className="text-sm text-text-body leading-relaxed">{mentor.bio}</p>
+                {mentor.englishOk && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                    English OK
+                  </span>
+                )}
               </div>
 
-              {/* Schedule */}
-              <div>
-                <h2 className="text-base font-bold text-text-body mb-3">対応スケジュール</h2>
-                <div className="grid grid-cols-7 gap-2">
-                  {mentor.schedule.map((day) => (
-                    <div key={day.day} className="text-center">
-                      <p className="text-xs font-medium text-text-description mb-2">{day.day}</p>
-                      {day.slots.length === 0 ? (
-                        <p className="text-xs text-text-description">-</p>
-                      ) : (
-                        <div className="space-y-1">
-                          {day.slots.map((slot) => (
-                            <span key={slot} className="block text-[11px] px-1 py-0.5 bg-green-50 text-green-600 rounded">
-                              {slot}
-                            </span>
+              {/* Skills */}
+              <div className="flex flex-wrap gap-1.5 mt-4">
+                {mentor.skills.map((skill) => (
+                  <span key={skill} className="inline-block px-2.5 py-1 text-xs text-text-body bg-bg-quaternary rounded-md font-medium">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+
+              {/* Catchphrase */}
+              <div className="mt-4 px-4 py-3 bg-brand-primary/5 border border-brand-primary/10 rounded-lg">
+                <p className="text-sm text-text-body leading-relaxed">{mentor.catchphrase}</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* ── Content sections ── */}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Left column (2/3) */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* 自己紹介 */}
+            <section>
+              <SectionTitle>自己紹介</SectionTitle>
+              <div className="rounded-xl border-2 border-[#3d3d5c] p-5">
+                <p className="text-sm text-text-body leading-relaxed whitespace-pre-wrap">{mentor.bio}</p>
+              </div>
+            </section>
+
+            {/* トピック一覧 */}
+            <section>
+              <SectionTitle>トピック</SectionTitle>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {mentor.topicContents.map((topic) => (
+                  <div key={topic.id} className="border-2 border-[#3d3d5c] rounded-xl overflow-hidden hover:border-brand-primary transition-colors flex flex-col">
+                    {/* Thumbnail */}
+                    <div className="aspect-[16/9] bg-bg-quaternary flex items-center justify-center">
+                      <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="text-text-description/30">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                      </svg>
+                    </div>
+                    <div className="p-3 flex flex-col flex-1">
+                      {/* Category + source */}
+                      <div className="flex items-center gap-2 text-[10px] mb-1.5">
+                        {topic.category && (
+                          <span className="font-bold text-brand-primary bg-brand-primary/10 px-1.5 py-0.5 rounded">{topic.category}</span>
+                        )}
+                        <span className="text-text-description">{topic.source}</span>
+                      </div>
+                      <h4 className="text-sm font-bold text-text-body line-clamp-2">{topic.title}</h4>
+                      {topic.summary && (
+                        <p className="text-xs text-text-description leading-relaxed mt-1.5 line-clamp-2">{topic.summary}</p>
+                      )}
+                      {/* こんなことを聞いてみよう */}
+                      <div className="mt-auto pt-3 border-t border-border-primary mt-3">
+                        <p className="text-[10px] font-bold text-text-description mb-1.5">💬 こんなことを聞いてみよう</p>
+                        <div className="flex flex-col gap-1">
+                          {topic.topics.map((t) => (
+                            <span key={t} className="text-[11px] text-brand-primary">・{t}</span>
                           ))}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 相談履歴 */}
+            <section>
+              <SectionTitle>相談履歴</SectionTitle>
+              <div className="flex flex-col gap-3">
+                {mentor.consultations.map((consultation) => (
+                  <PastConsultationCard key={consultation.id} consultation={consultation} />
+                ))}
+              </div>
+            </section>
+
+            {/* 職歴 */}
+            <section>
+              <SectionTitle>職歴</SectionTitle>
+              <div className="rounded-xl border-2 border-[#3d3d5c] p-5">
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-[5px] top-2 bottom-2 w-0.5 bg-border-primary" />
+                  <div className="space-y-6">
+                    {mentor.careerHistory.map((career, i) => (
+                      <div key={i} className="flex gap-4 relative">
+                        {/* Dot */}
+                        <div className={`shrink-0 mt-1.5 size-[11px] rounded-full border-2 z-10 ${i === 0 ? "bg-brand-primary border-brand-primary" : "bg-white border-border-primary"}`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs text-text-description font-medium">{career.period}</span>
+                          </div>
+                          <p className="text-sm font-bold text-text-body mt-0.5">{career.company}</p>
+                          <p className="text-xs text-brand-primary font-medium mt-0.5">{career.role}</p>
+                          <p className="text-xs text-text-description leading-relaxed mt-1.5">{career.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            </section>
+          </div>
 
-          {activeTab === "topics" && (
-            <div className="grid grid-cols-3 gap-3">
-              {mentor.topicContents.map((topic) => (
-                <TopicCard key={topic.id} content={topic} />
-              ))}
-            </div>
-          )}
-
-          {activeTab === "consultations" && (
-            <div className="flex flex-col gap-2">
-              {mentor.consultations.map((consultation) => (
-                <PastConsultationCard key={consultation.id} consultation={consultation} />
-              ))}
-            </div>
-          )}
-
-          {activeTab === "reviews" && (
-            <div className="space-y-4">
-              {mentor.reviews.map((review) => (
-                <div key={review.id} className="p-4 rounded-xl border border-border-primary">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="size-8 rounded-full bg-bg-quaternary flex items-center justify-center">
-                      <span className="text-xs font-medium text-text-description">{review.userName.charAt(review.userName.length - 1)}</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-text-body">{review.userName}</p>
-                      <p className="text-xs text-text-description">{review.date}</p>
-                    </div>
-                    <StarRating rating={review.rating} />
+          {/* Right column (1/3): Schedule + sticky CTA */}
+          <div className="space-y-6">
+            {/* Schedule */}
+            <div className="rounded-xl border-2 border-[#3d3d5c] p-5 lg:sticky lg:top-20">
+              <h3 className="text-sm font-bold text-text-body mb-4">対応スケジュール</h3>
+              <div className="grid grid-cols-7 gap-1.5">
+                {mentor.schedule.map((day) => (
+                  <div key={day.day} className="text-center">
+                    <p className="text-[11px] font-bold text-text-description mb-2">{day.day}</p>
+                    {day.slots.length === 0 ? (
+                      <p className="text-xs text-text-description/50">-</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {day.slots.map((slot) => (
+                          <span key={slot} className="block text-[10px] px-0.5 py-0.5 bg-green-50 text-green-600 rounded font-medium">
+                            {slot}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-text-body leading-relaxed">{review.comment}</p>
-                </div>
-              ))}
+                ))}
+              </div>
+              <button className="w-full mt-4 py-2.5 bg-brand-primary text-white font-bold rounded-lg hover:opacity-90 transition-opacity cursor-pointer text-sm">
+                このメンターに相談する
+              </button>
             </div>
-          )}
+          </div>
         </div>
-      </div>
-    </TwoColumnLayout>
+      </main>
+
+      <Footer />
+      <BottomNav activeNav="1on1" />
+    </div>
   );
 }
