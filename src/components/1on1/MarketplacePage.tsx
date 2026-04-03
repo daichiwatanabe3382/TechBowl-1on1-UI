@@ -262,7 +262,7 @@ function Carousel({ children, itemWidth, gap = 12 }: { children: ReactNode[]; it
   const translateX = -(page * visibleCount * itemPercent);
 
   return (
-    <div className="relative group" ref={containerRef}>
+    <div className="relative group lg:px-5" ref={containerRef}>
       {/* デスクトップ: スライドアニメーション */}
       <div className="hidden lg:block overflow-hidden">
         <div
@@ -276,7 +276,7 @@ function Carousel({ children, itemWidth, gap = 12 }: { children: ReactNode[]; it
             <div
               key={i}
               className="shrink-0 [&>*]:h-full"
-              style={{ width: `calc(${itemPercent}% - ${gap * (visibleCount - 1) / visibleCount}px)` }}
+              style={{ width: `calc(${itemPercent}% - ${gap * (visibleCount - 1) / visibleCount + 2}px)` }}
             >
               {child}
             </div>
@@ -285,7 +285,7 @@ function Carousel({ children, itemWidth, gap = 12 }: { children: ReactNode[]; it
       </div>
 
       {/* SP: 横スクロール */}
-      <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 lg:hidden [&>*]:h-auto">
+      <div className="flex gap-3 overflow-x-auto pb-2 pt-1 -mx-1 px-1 lg:hidden [&>*]:h-auto">
         {children.map((child, i) => (
           <div key={i} className="shrink-0" style={{ width: itemWidth }}>
             {child}
@@ -298,7 +298,7 @@ function Carousel({ children, itemWidth, gap = 12 }: { children: ReactNode[]; it
         <button
           type="button"
           onClick={handlePrev}
-          className="hidden lg:flex absolute -left-4 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-white border border-border-primary shadow-md hover:bg-bg-tertiary transition-colors cursor-pointer z-10"
+          className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-white border border-border-primary shadow-md hover:bg-bg-tertiary transition-colors cursor-pointer z-10"
         >
           <svg width={18} height={18} viewBox="0 0 24 24" fill="currentColor" className="rotate-180">
             <path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z" />
@@ -311,7 +311,7 @@ function Carousel({ children, itemWidth, gap = 12 }: { children: ReactNode[]; it
         <button
           type="button"
           onClick={handleNext}
-          className="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-white border border-border-primary shadow-md hover:bg-bg-tertiary transition-colors cursor-pointer z-10"
+          className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-white border border-border-primary shadow-md hover:bg-bg-tertiary transition-colors cursor-pointer z-10"
         >
           <svg width={18} height={18} viewBox="0 0 24 24" fill="currentColor">
             <path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z" />

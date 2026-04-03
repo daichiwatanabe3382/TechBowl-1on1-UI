@@ -380,30 +380,6 @@ export function TopicCard({ content }: { content: TopicContent }) {
         </div>
       </a>
 
-      {/* Mentor CTA - primary action to mentor detail */}
-      <a
-        href={`/1on1/topic/${content.id}`}
-        className="flex flex-col gap-2 mt-auto border-t border-border-primary px-3 py-2.5 rounded-b-xl transition-colors hover:bg-brand-primary/5 group/mentor"
-      >
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0 ring-2 ring-white">
-            <Image
-              src={content.mentorAvatar}
-              alt={content.mentorName}
-              width={32}
-              height={32}
-              className="object-cover w-full h-full"
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-text-body truncate">{content.mentorName}</p>
-            <span className="text-[10px] text-green-600 font-medium">予約受付中</span>
-          </div>
-        </div>
-        <span className="w-full text-center py-1.5 text-[11px] font-bold text-brand-primary bg-brand-primary/5 border border-brand-primary/20 rounded-full group-hover/mentor:bg-brand-primary group-hover/mentor:text-white transition-colors">
-          このメンターに聞く →
-        </span>
-      </a>
     </div>
   );
 }
@@ -500,22 +476,6 @@ function TimelineCard({ content }: { content: TopicContent }) {
             </div>
           )}
         </div>
-      </a>
-      {/* Mentor CTA - links to mentor detail */}
-      <a
-        href={`/1on1/topic/${content.id}`}
-        className="flex items-center gap-3 px-4 py-2.5 border-t border-border-primary hover:bg-brand-primary/5 transition-colors group/mentor"
-      >
-        <div className="w-9 h-9 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">
-          <Image src={content.mentorAvatar} alt={content.mentorName} width={36} height={36} className="object-cover w-full h-full" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <span className="text-sm font-bold text-text-body truncate block">{content.mentorName}</span>
-          <span className="text-[11px] text-green-600 font-medium">予約受付中</span>
-        </div>
-        <span className="shrink-0 flex items-center gap-1 px-4 py-2 text-xs font-bold text-white bg-brand-primary rounded-full group-hover/mentor:opacity-80 transition-opacity">
-          このメンターに聞く →
-        </span>
       </a>
     </div>
   );
