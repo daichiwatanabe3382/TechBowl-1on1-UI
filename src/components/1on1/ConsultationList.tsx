@@ -296,9 +296,11 @@ export function PastConsultationCard({ consultation, hideMentor, actionButton }:
     </>
   );
 
-  const cardClass = "bg-white border-2 border-[#3d3d5c] rounded-xl p-4 hover:border-brand-primary transition-colors h-full flex flex-col";
+  // メンター詳細ページ（hideMentor）では太線、それ以外は細線
+  const cardClass = hideMentor
+    ? "bg-white border-2 border-[#3d3d5c] rounded-xl p-4 hover:border-brand-primary transition-colors h-full flex flex-col"
+    : "bg-white border border-border-primary rounded-xl p-4 hover:border-brand-primary transition-colors h-full flex flex-col";
 
-  // メンター詳細ページ（hideMentor）では actionButton があるので div のまま
   if (hideMentor) {
     return <div className={cardClass}>{cardContent}</div>;
   }
