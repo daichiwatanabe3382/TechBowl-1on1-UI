@@ -332,17 +332,16 @@ export default function MarketplacePage() {
 
   return (
     <BaseLayout activeNav="1on1">
+      {/* ヘッダーバナー */}
       <div className="w-full overflow-hidden">
-        {/* ヘッダーバナー */}
-        <div className="w-full overflow-hidden">
-          <img
-            src="/image/1on1/headerbanner-1on1.png"
-            alt="1on1 - メンターと話しながら技術やキャリアについて思考を深めよう"
-            className="w-full h-[80px] object-cover lg:h-auto lg:object-contain"
-          />
-        </div>
-        {/* メニューバー */}
-        <div className="border-b border-border-primary bg-white sticky top-[49px] lg:top-[65px] z-30">
+        <img
+          src="/image/1on1/headerbanner-1on1.png"
+          alt="1on1 - メンターと話しながら技術やキャリアについて思考を深めよう"
+          className="w-full h-[80px] object-cover lg:h-auto lg:object-contain"
+        />
+      </div>
+      {/* メニューバー */}
+      <div className="border-b border-border-primary bg-white sticky top-[61px] lg:top-[65px] z-30">
           <div className="max-w-[1440px] mx-auto px-3 lg:px-6">
             <div className="flex overflow-x-auto">
               {menuItems.map((item) => {
@@ -658,7 +657,6 @@ export default function MarketplacePage() {
         </div>
         </div>
         )}
-      </div>
     </BaseLayout>
   );
 }

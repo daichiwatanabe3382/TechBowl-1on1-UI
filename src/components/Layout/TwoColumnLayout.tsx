@@ -34,7 +34,7 @@ export default function TwoColumnLayout({
         <main className="flex-1 min-w-0 flex flex-col pb-14 lg:pb-0">
           {headerBanner}
           {mobileTabs && (
-            <div className="lg:hidden">{mobileTabs}</div>
+            <div className="lg:hidden sticky top-[61px] z-30">{mobileTabs}</div>
           )}
           <div className="px-3 lg:px-6 flex-1">
             <div className="max-w-[1440px] mx-auto">{children}</div>
