@@ -497,52 +497,7 @@ export default function ConsultationList({ onNavigateToMentors, initialCategory,
           ))}
         </div>
 
-        {/* カテゴリ選択時のみ関連タグを表示 */}
-        {selectedCategory && categoryRelatedTags[selectedCategory] && (
-          <div className="mt-4 pt-4 border-t border-border-primary">
-            <div className="flex items-center gap-2 mb-2.5">
-              <span className="text-xs font-bold text-text-description">どんなテーマで話す？</span>
-              <span className="text-[10px] text-text-description bg-bg-quaternary px-1.5 py-0.5 rounded">🏷️ 関連タグ</span>
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {categoryRelatedTags[selectedCategory].map((tag) => (
-                <button
-                  key={tag.label}
-                  type="button"
-                  onClick={() => {
-                    setSelectedTrend(selectedTrend === tag.label ? null : tag.label);
-                    setShowAllMentors(false);
-                  }}
-                  className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
-                    selectedTrend === tag.label
-                      ? "bg-brand-primary text-white border-brand-primary"
-                      : "bg-bg-secondary text-text-body border-border-primary hover:bg-brand-primary/5 hover:border-brand-primary hover:text-brand-primary"
-                  }`}
-                >
-                  <span>{tag.emoji}</span>
-                  <span>{tag.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </section>
-
-      {/* ── フィルターサマリー ── */}
-      {hasActiveFilters && (
-        <div className="flex items-center justify-between bg-brand-primary/5 rounded-xl px-4 py-3 mb-6 border border-brand-primary/10">
-          <span className="text-sm text-text-body">
-            🎯 あなたにおすすめのメンターを<span className="font-bold text-brand-primary"> {DISPLAY_COUNT}名 </span>厳選しました！
-          </span>
-          <button
-            type="button"
-            onClick={clearAll}
-            className="text-xs text-text-description hover:text-brand-primary cursor-pointer transition-colors"
-          >
-            条件をリセット
-          </button>
-        </div>
-      )}
 
       {/* ── 対応できるメンター ── */}
       <section className="mb-8">
