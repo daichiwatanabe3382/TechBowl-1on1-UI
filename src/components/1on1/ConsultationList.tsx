@@ -262,7 +262,7 @@ function FilterTag({
 export { type PastConsultation };
 export function PastConsultationCard({ consultation, hideMentor, actionButton }: { consultation: PastConsultation; hideMentor?: boolean; actionButton?: React.ReactNode }) {
   return (
-    <div className="bg-white border border-border-primary rounded-xl p-4 hover:border-brand-primary transition-colors h-full flex flex-col">
+    <div className="bg-white border-2 border-[#3d3d5c] rounded-xl p-4 hover:border-brand-primary transition-colors h-full flex flex-col">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-start gap-2">
           <span className="shrink-0 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full mt-0.5">悩み</span>

@@ -37,11 +37,15 @@ const mentorData = {
     { id: "1", title: "実践ハーネスエンジニアリング", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "登壇資料・スライド", source: "Speaker Deck", thumbnail: "/image/placeholder-article-1.svg", topics: ["テストハーネスの設計パターン", "E2Eテストの自動化戦略"], summary: "テストハーネスの設計から運用までを体系的に解説。実プロジェクトでの導入事例を交えながら、持続可能なテスト基盤の構築方法を紹介。", updatedAt: "2026-03-30" },
     { id: "2", title: "テスト自動化のベストプラクティス", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "技術記事", source: "Zenn", thumbnail: "/image/placeholder-article-2.svg", topics: ["テスト戦略の立て方", "CI/CDでの自動テスト"], summary: "ユニットテスト・統合テスト・E2Eテストの使い分けと、チームで回すための自動化のコツ。", updatedAt: "2026-03-25" },
     { id: "3", title: "CI/CDパイプライン設計入門", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "技術記事", source: "Qiita", thumbnail: "/image/placeholder-article-1.svg", topics: ["GitHub Actionsの活用", "デプロイ自動化"], summary: "GitHub Actionsを使ったCI/CDパイプラインの設計と、段階的な自動化の進め方を解説。", updatedAt: "2026-03-18" },
+    { id: "4", title: "フロントエンドテストの全体像", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "技術記事", source: "Zenn", thumbnail: "/image/placeholder-article-2.svg", topics: ["Vitestの導入", "コンポーネントテスト設計"], summary: "フロントエンドにおけるテストの全体像を整理し、Vitestを使った実践的なテスト手法を紹介。", updatedAt: "2026-03-12" },
+    { id: "5", title: "テスト駆動開発（TDD）実践ガイド", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", category: "登壇資料・スライド", source: "Speaker Deck", thumbnail: "/image/placeholder-article-1.svg", topics: ["TDDサイクルの回し方", "レガシーコードへの適用"], summary: "TDDの基本サイクルから、既存コードベースへの段階的な導入方法までを実例で解説。", updatedAt: "2026-03-05" },
   ] satisfies TopicContent[],
   consultations: [
     { id: "c1", before: "テストを書く習慣がなく、リファクタリングが怖い", after: "テスト戦略が明確になり、安心してコードを変えられるように", caption: "どこからテストを書き始めるか、優先順位を一緒に整理してもらえました", categoryLabel: "コードレビュー", categoryId: "code-review", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.20" },
     { id: "c2", before: "CI/CDのビルドが毎回10分以上かかって辛い", after: "キャッシュ戦略とステージ分割で3分に短縮", caption: "ボトルネックの特定方法から教えてもらい、自分でも改善を続けられるようになりました", categoryLabel: "業務で詰まっている", categoryId: "stuck", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.15" },
     { id: "c3", before: "GitHub Actionsのワークフロー、何が正解かわからない", after: "チーム規模に合った現実的な構成が決まった", caption: "理想と現実のバランスを考慮して提案してくれたのが助かりました", categoryLabel: "技術選定", categoryId: "tech-selection", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.10" },
+    { id: "c4", before: "E2Eテストが不安定で毎回手動確認している", after: "Playwrightで安定したE2Eテスト基盤ができた", caption: "テストの書き方だけでなく、CIでの安定実行のコツまで教えてもらえました", categoryLabel: "業務で詰まっている", categoryId: "stuck", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.03.05" },
+    { id: "c5", before: "コードレビューで何を見ればいいかわからない", after: "レビュー観点が整理され、指摘の質が上がった", caption: "チーム全体のレビュー文化を変えるきっかけになりました", categoryLabel: "コードレビュー", categoryId: "code-review", mentorName: "Takuma Kajikawa", mentorAvatar: "/image/home/puru-image.png", mentorId: "demo", date: "2026.02.28" },
   ] satisfies PastConsultation[],
   careerHistory: [
     { period: "2024 - 現在", company: "TechBowl Inc.", role: "ソフトウェアエンジニア", description: "テスト自動化基盤の設計・開発。CI/CDパイプラインの構築と運用改善をリード。OSSテストフレームワークのメンテナー。" },
@@ -98,6 +102,10 @@ export default function MentorDetailPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [selectedStance, setSelectedStance] = useState<string | null>(null);
+  const [showAllTopics, setShowAllTopics] = useState(false);
+  const [showAllConsultations, setShowAllConsultations] = useState(false);
+  const INITIAL_TOPIC_COUNT = 3;
+  const INITIAL_CONSULTATION_COUNT = 3;
   const formRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const calendarScrollRef = useRef<HTMLDivElement>(null);
@@ -281,14 +289,14 @@ export default function MentorDetailPage() {
             <section>
               <SectionTitle>トピック</SectionTitle>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {mentor.topicContents.map((topic) => (
+                {(showAllTopics ? mentor.topicContents : mentor.topicContents.slice(0, INITIAL_TOPIC_COUNT)).map((topic) => (
                   <div key={topic.id} className="border-2 border-[#3d3d5c] rounded-xl overflow-hidden hover:border-brand-primary transition-colors flex flex-col">
-                    {/* Thumbnail */}
-                    <div className="aspect-[16/9] bg-bg-quaternary flex items-center justify-center">
+                    {/* Thumbnail → トピック詳細へのリンク */}
+                    <a href={`/1on1/topic/${topic.id}`} className="block aspect-[16/9] bg-bg-quaternary flex items-center justify-center hover:opacity-80 transition-opacity">
                       <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="text-text-description/30">
                         <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
                       </svg>
-                    </div>
+                    </a>
                     <div className="p-3 flex flex-col flex-1">
                       {/* Category + source */}
                       <div className="flex items-center gap-2 text-[10px] mb-1.5">
@@ -297,7 +305,9 @@ export default function MentorDetailPage() {
                         )}
                         <span className="text-text-description">{topic.source}</span>
                       </div>
-                      <h4 className="text-sm font-bold text-text-body line-clamp-2">{topic.title}</h4>
+                      <a href={`/1on1/topic/${topic.id}`} className="text-sm font-bold text-text-body line-clamp-2 hover:text-brand-primary transition-colors">
+                        {topic.title}
+                      </a>
                       {topic.summary && (
                         <p className="text-xs text-text-description leading-relaxed mt-1.5 line-clamp-2">{topic.summary}</p>
                       )}
@@ -324,13 +334,22 @@ export default function MentorDetailPage() {
                   </div>
                 ))}
               </div>
+              {mentor.topicContents.length > INITIAL_TOPIC_COUNT && !showAllTopics && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllTopics(true)}
+                  className="mt-3 w-full py-2.5 text-sm font-bold text-brand-primary bg-brand-primary/5 hover:bg-brand-primary/10 rounded-lg transition-colors cursor-pointer"
+                >
+                  すべてのトピックを見る（残り {mentor.topicContents.length - INITIAL_TOPIC_COUNT} 件）
+                </button>
+              )}
             </section>
 
             {/* 相談履歴 */}
             <section>
               <SectionTitle>相談履歴</SectionTitle>
               <div className="flex flex-col gap-3">
-                {mentor.consultations.map((consultation) => (
+                {(showAllConsultations ? mentor.consultations : mentor.consultations.slice(0, INITIAL_CONSULTATION_COUNT)).map((consultation) => (
                   <PastConsultationCard
                     key={consultation.id}
                     consultation={consultation}
@@ -350,6 +369,15 @@ export default function MentorDetailPage() {
                   />
                 ))}
               </div>
+              {mentor.consultations.length > INITIAL_CONSULTATION_COUNT && !showAllConsultations && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllConsultations(true)}
+                  className="mt-3 w-full py-2.5 text-sm font-bold text-brand-primary bg-brand-primary/5 hover:bg-brand-primary/10 rounded-lg transition-colors cursor-pointer"
+                >
+                  すべての相談履歴を見る（残り {mentor.consultations.length - INITIAL_CONSULTATION_COUNT} 件）
+                </button>
+              )}
             </section>
 
             {/* 職歴 */}
