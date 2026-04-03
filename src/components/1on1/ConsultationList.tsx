@@ -260,7 +260,7 @@ function FilterTag({
 }
 
 export { type PastConsultation };
-export function PastConsultationCard({ consultation }: { consultation: PastConsultation }) {
+export function PastConsultationCard({ consultation, hideMentor, actionButton }: { consultation: PastConsultation; hideMentor?: boolean; actionButton?: React.ReactNode }) {
   return (
     <div className="bg-white border border-border-primary rounded-xl p-4 hover:border-brand-primary transition-colors h-full flex flex-col">
       <div className="flex flex-col gap-1.5">
@@ -276,19 +276,25 @@ export function PastConsultationCard({ consultation }: { consultation: PastConsu
       </div>
       <p className="text-xs text-text-description leading-relaxed mt-2.5 line-clamp-2 flex-1">{consultation.caption}</p>
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-primary">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">
-            <img src={consultation.mentorAvatar} alt={consultation.mentorName} className="object-cover w-full h-full" />
-          </div>
-          <span className="text-xs font-medium text-text-body">{consultation.mentorName}</span>
+        {hideMentor ? (
           <span className="text-[10px] text-text-description">{consultation.date}</span>
-        </div>
-        <a
-          href="/1on1/mentor/demo"
-          className="text-xs font-bold text-brand-primary hover:underline shrink-0"
-        >
-          相談してみる →
-        </a>
+        ) : (
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full overflow-hidden bg-bg-quaternary flex-shrink-0">
+              <img src={consultation.mentorAvatar} alt={consultation.mentorName} className="object-cover w-full h-full" />
+            </div>
+            <span className="text-xs font-medium text-text-body">{consultation.mentorName}</span>
+            <span className="text-[10px] text-text-description">{consultation.date}</span>
+          </div>
+        )}
+        {actionButton || (
+          <a
+            href="/1on1/mentor/demo"
+            className="text-xs font-bold text-brand-primary hover:underline shrink-0"
+          >
+            相談してみる →
+          </a>
+        )}
       </div>
     </div>
   );
