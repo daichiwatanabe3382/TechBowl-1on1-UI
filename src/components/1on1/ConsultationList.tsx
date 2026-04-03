@@ -87,6 +87,60 @@ const trendingTopics: { emoji: string; label: string; matchSkills: string[] }[] 
   { emoji: "📝", label: "技術ブログの始め方", matchSkills: [] },
 ];
 
+// カテゴリ選択時に表示する関連タグ
+const categoryRelatedTags: Record<string, { emoji: string; label: string; matchSkills: string[] }[]> = {
+  "code-review": [
+    { emoji: "⚛️", label: "React / Next.js", matchSkills: ["react", "next.js"] },
+    { emoji: "🟦", label: "TypeScript", matchSkills: ["typescript"] },
+    { emoji: "🟢", label: "Vue.js / Nuxt", matchSkills: ["vue.js", "nuxt"] },
+    { emoji: "🐍", label: "Python / Django", matchSkills: ["python", "django"] },
+    { emoji: "🦫", label: "Go", matchSkills: ["go"] },
+    { emoji: "☕", label: "Java / Spring", matchSkills: ["java", "spring"] },
+    { emoji: "💎", label: "Ruby / Rails", matchSkills: ["ruby", "rails"] },
+    { emoji: "📱", label: "モバイル（Swift / Kotlin）", matchSkills: ["swift", "kotlin", "flutter"] },
+  ],
+  "career": [
+    { emoji: "🌐", label: "Web系への転職", matchSkills: ["react", "typescript", "next.js", "ruby", "rails"] },
+    { emoji: "🏢", label: "外資系ITに入りたい", matchSkills: ["go", "rust", "python", "c++", "kubernetes"] },
+    { emoji: "🚀", label: "スタートアップで働く", matchSkills: ["next.js", "node.js", "go", "typescript"] },
+    { emoji: "💰", label: "フリーランス独立", matchSkills: ["react", "typescript", "php", "swift", "flutter"] },
+    { emoji: "📊", label: "年収アップ戦略", matchSkills: [] },
+    { emoji: "🧭", label: "新卒・若手のキャリア", matchSkills: [] },
+  ],
+  "tech-selection": [
+    { emoji: "⚛️", label: "フロントエンド（React vs Vue）", matchSkills: ["react", "next.js", "vue.js", "nuxt", "angular"] },
+    { emoji: "🔧", label: "バックエンド（Go vs Node vs Python）", matchSkills: ["go", "node.js", "python", "ruby", "java"] },
+    { emoji: "☁️", label: "クラウド（AWS vs GCP）", matchSkills: ["aws", "gcp", "terraform"] },
+    { emoji: "🗄️", label: "DB選定", matchSkills: ["postgresql", "mysql", "mongodb", "redis", "bigquery"] },
+    { emoji: "📦", label: "モノレポ vs マルチレポ", matchSkills: ["typescript", "go", "node.js"] },
+    { emoji: "🔄", label: "REST vs GraphQL vs gRPC", matchSkills: ["graphql", "grpc", "node.js", "go"] },
+  ],
+  "design-review": [
+    { emoji: "🏗️", label: "API設計", matchSkills: ["go", "node.js", "python", "java", "grpc", "graphql"] },
+    { emoji: "🗃️", label: "DB設計", matchSkills: ["postgresql", "mysql", "mongodb"] },
+    { emoji: "📐", label: "DDD・ドメイン設計", matchSkills: ["java", "go", "typescript", "ddd", "マイクロサービス"] },
+    { emoji: "🧩", label: "マイクロサービス", matchSkills: ["go", "grpc", "kubernetes", "docker", "マイクロサービス"] },
+    { emoji: "🎨", label: "コンポーネント設計", matchSkills: ["react", "vue.js", "typescript", "css"] },
+    { emoji: "🔐", label: "認証・認可", matchSkills: ["aws", "node.js", "セキュリティ"] },
+  ],
+  "stuck": [
+    { emoji: "🐛", label: "デバッグ・エラー解決", matchSkills: ["javascript", "typescript", "python", "java", "ruby"] },
+    { emoji: "🐳", label: "Docker / 環境構築", matchSkills: ["docker", "aws", "ci/cd"] },
+    { emoji: "⚡", label: "パフォーマンス改善", matchSkills: ["react", "python", "sql", "redis"] },
+    { emoji: "🔄", label: "CI/CD がうまくいかない", matchSkills: ["github actions", "docker", "ci/cd"] },
+    { emoji: "📱", label: "アプリのビルド・リリース", matchSkills: ["swift", "kotlin", "flutter", "react native"] },
+    { emoji: "🌐", label: "デプロイ・インフラ周り", matchSkills: ["aws", "gcp", "terraform", "docker", "kubernetes"] },
+  ],
+  "casual": [
+    { emoji: "☕", label: "エンジニアの雑談", matchSkills: [] },
+    { emoji: "💭", label: "もやもや整理", matchSkills: [] },
+    { emoji: "🎯", label: "今後の目標を考えたい", matchSkills: [] },
+    { emoji: "📚", label: "勉強法の相談", matchSkills: [] },
+    { emoji: "👥", label: "チーム・人間関係", matchSkills: [] },
+    { emoji: "🌟", label: "モチベーション回復", matchSkills: [] },
+  ],
+};
+
 // 相談事例（Before/After形式）
 type PastConsultation = {
   id: string;
@@ -260,9 +314,22 @@ function useFilteredMentors(
     const limit = (list: typeof mentors) =>
       showAll ? list : list.slice(0, DISPLAY_COUNT);
 
-    // トレンドトピックが選択されている場合
+    // トレンドまたは関連タグが選択されている場合
     if (selectedTrend) {
-      const trend = trendingTopics.find((t) => t.label === selectedTrend);
+      // まずトレンドから探す
+      let trend = trendingTopics.find((t) => t.label === selectedTrend);
+      // なければカテゴリの関連タグから探す
+      if (!trend && selectedCategory) {
+        const tags = categoryRelatedTags[selectedCategory];
+        trend = tags?.find((t) => t.label === selectedTrend);
+      }
+      // それでもなければ全カテゴリの関連タグから探す
+      if (!trend) {
+        for (const tags of Object.values(categoryRelatedTags)) {
+          trend = tags.find((t) => t.label === selectedTrend);
+          if (trend) break;
+        }
+      }
       if (!trend) return { displayed: [], totalCount: 0 };
       if (trend.matchSkills.length === 0) {
         const all = mentors.filter((m) => m.availability !== "full");
@@ -330,8 +397,8 @@ function TabToggle({ tab, onChange }: { tab: ConsultationTab; onChange: (t: Cons
 
 // ── メインコンポーネント ──
 
-export default function ConsultationList({ onNavigateToMentors, initialCategory, initialTrend }: { onNavigateToMentors?: () => void; initialCategory?: string | null; initialTrend?: string | null }) {
-  const [activeTab, setActiveTab] = useState<ConsultationTab>("find");
+export default function ConsultationList({ onNavigateToMentors, initialCategory, initialTrend, initialTab }: { onNavigateToMentors?: () => void; initialCategory?: string | null; initialTrend?: string | null; initialTab?: "find" | "examples" }) {
+  const [activeTab, setActiveTab] = useState<ConsultationTab>(initialTab ?? "find");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory ?? null);
   const [selectedProblems, setSelectedProblems] = useState<Set<string>>(new Set());
   const [selectedTech, setSelectedTech] = useState<Set<string>>(new Set());
@@ -430,96 +497,64 @@ export default function ConsultationList({ onNavigateToMentors, initialCategory,
           ))}
         </div>
 
-        {/* 今みんなが話してること */}
+        {/* カテゴリ選択時: 関連タグ / 未選択時: トレンド */}
         <div className="mt-4 pt-4 border-t border-border-primary">
-          <div className="flex items-center gap-2 mb-2.5">
-            <span className="text-xs font-bold text-text-description">今みんなが話してること</span>
-            <span className="text-[10px] text-text-description bg-bg-quaternary px-1.5 py-0.5 rounded">🔥 トレンド</span>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {trendingTopics.map((topic) => (
-              <button
-                key={topic.label}
-                type="button"
-                onClick={() => {
-                  setSelectedTrend(selectedTrend === topic.label ? null : topic.label);
-                  setSelectedCategory(null); // トレンド選択でカテゴリ解除
-                  setShowAllMentors(false);
-                }}
-                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
-                  selectedTrend === topic.label
-                    ? "bg-brand-primary text-white border-brand-primary"
-                    : "bg-bg-secondary text-text-body border-border-primary hover:bg-brand-primary/5 hover:border-brand-primary hover:text-brand-primary"
-                }`}
-              >
-                <span>{topic.emoji}</span>
-                <span>{topic.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 詳細に絞り込む（折りたたみ） ── */}
-      <section className="mb-6">
-        <button
-          type="button"
-          onClick={() => setIsDetailOpen(!isDetailOpen)}
-          className="flex items-center gap-2 text-sm font-bold text-text-body hover:text-brand-primary cursor-pointer transition-colors mb-3"
-        >
-          <span>詳細に絞り込む</span>
-          {(selectedProblems.size > 0 || selectedTech.size > 0) && (
-            <span className="text-[10px] font-bold text-white bg-brand-primary px-1.5 py-0.5 rounded-full">
-              {selectedProblems.size + selectedTech.size}
-            </span>
+          {selectedCategory && categoryRelatedTags[selectedCategory] ? (
+            <>
+              <div className="flex items-center gap-2 mb-2.5">
+                <span className="text-xs font-bold text-text-description">どんなテーマで話す？</span>
+                <span className="text-[10px] text-text-description bg-bg-quaternary px-1.5 py-0.5 rounded">🏷️ 関連タグ</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {categoryRelatedTags[selectedCategory].map((tag) => (
+                  <button
+                    key={tag.label}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTrend(selectedTrend === tag.label ? null : tag.label);
+                      setShowAllMentors(false);
+                    }}
+                    className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
+                      selectedTrend === tag.label
+                        ? "bg-brand-primary text-white border-brand-primary"
+                        : "bg-bg-secondary text-text-body border-border-primary hover:bg-brand-primary/5 hover:border-brand-primary hover:text-brand-primary"
+                    }`}
+                  >
+                    <span>{tag.emoji}</span>
+                    <span>{tag.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 mb-2.5">
+                <span className="text-xs font-bold text-text-description">今みんなが話してること</span>
+                <span className="text-[10px] text-text-description bg-bg-quaternary px-1.5 py-0.5 rounded">🔥 トレンド</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {trendingTopics.map((topic) => (
+                  <button
+                    key={topic.label}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTrend(selectedTrend === topic.label ? null : topic.label);
+                      setSelectedCategory(null); // トレンド選択でカテゴリ解除
+                      setShowAllMentors(false);
+                    }}
+                    className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
+                      selectedTrend === topic.label
+                        ? "bg-brand-primary text-white border-brand-primary"
+                        : "bg-bg-secondary text-text-body border-border-primary hover:bg-brand-primary/5 hover:border-brand-primary hover:text-brand-primary"
+                    }`}
+                  >
+                    <span>{topic.emoji}</span>
+                    <span>{topic.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
           )}
-          <svg
-            width={14}
-            height={14}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            className={`transition-transform duration-200 ${isDetailOpen ? "rotate-180" : ""}`}
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </button>
-
-        <div className={`transition-all duration-200 ease-in-out overflow-hidden ${
-          isDetailOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-        }`}>
-          <div className="bg-white border border-border-primary rounded-xl p-4 flex flex-col gap-4">
-            {/* 課題 */}
-            <div>
-              <h4 className="text-xs font-bold text-text-description mb-2">解決したい課題</h4>
-              <div className="flex flex-wrap gap-2">
-                {problemCategories.map((problem) => (
-                  <FilterTag
-                    key={problem.id}
-                    label={problem.label}
-                    icon={problem.icon}
-                    isSelected={selectedProblems.has(problem.id)}
-                    onToggle={() => toggleProblem(problem.id)}
-                  />
-                ))}
-              </div>
-            </div>
-            {/* 技術分野 */}
-            <div>
-              <h4 className="text-xs font-bold text-text-description mb-2">技術分野</h4>
-              <div className="flex flex-wrap gap-2">
-                {techFields.map((field) => (
-                  <FilterTag
-                    key={field.id}
-                    label={field.label}
-                    isSelected={selectedTech.has(field.id)}
-                    onToggle={() => toggleTech(field.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 

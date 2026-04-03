@@ -208,18 +208,22 @@ const featuredTopics = allContents.slice(0, 6);
 const newTopics = allContents.slice(0, 4);
 
 // ── セクションヘッダー ──
-function SectionHeader({ icon, title, moreHref, moreLabel = "もっと見る →" }: { icon?: ReactNode; title: string; moreHref?: string; moreLabel?: string }) {
+function SectionHeader({ icon, title, moreHref, moreLabel = "もっと見る →", onMoreClick }: { icon?: ReactNode; title: string; moreHref?: string; moreLabel?: string; onMoreClick?: () => void }) {
   return (
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-lg font-bold text-text-body flex items-center gap-2">
         {icon && <span className="text-brand-primary">{icon}</span>}
         {title}
       </h3>
-      {moreHref && (
+      {onMoreClick ? (
+        <button type="button" onClick={onMoreClick} className="text-sm text-brand-primary hover:underline shrink-0 cursor-pointer">
+          {moreLabel}
+        </button>
+      ) : moreHref ? (
         <a href={moreHref} className="text-sm text-brand-primary hover:underline shrink-0">
           {moreLabel}
         </a>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -323,6 +327,7 @@ export default function MarketplacePage() {
   const [activeMenu, setActiveMenu] = useState("reserve");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchMode, setSearchMode] = useState<"consultation" | "topic" | "mentor" | null>(null);
+  const [consultationTab, setConsultationTab] = useState<"find" | "examples">("find");
   const [expandedTech, setExpandedTech] = useState<string | null>(null);
 
   return (
@@ -380,7 +385,7 @@ export default function MarketplacePage() {
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => { setSearchMode(tab.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    onClick={() => { if (tab.id === "consultation") setConsultationTab("find"); setSearchMode(tab.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                     className={`flex flex-col items-center gap-1.5 px-4 py-4 rounded-xl transition-all cursor-pointer border-2 ${
                       isActive
                         ? "bg-brand-primary/5 border-brand-primary"
@@ -413,7 +418,7 @@ export default function MarketplacePage() {
                         type="button"
                         onClick={() => {
                           setSelectedCategory(isActive ? null : cat.id);
-                          if (!isActive) setSearchMode("consultation");
+                          if (!isActive) { setConsultationTab("find"); setSearchMode("consultation"); }
                         }}
                         className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors cursor-pointer text-left ${
                           isActive
@@ -446,7 +451,7 @@ export default function MarketplacePage() {
                         type="button"
                         onClick={() => {
                           setSelectedCategory(isActive ? null : cat.id);
-                          if (!isActive) setSearchMode("consultation");
+                          if (!isActive) { setConsultationTab("find"); setSearchMode("consultation"); }
                         }}
                         className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] rounded-full transition-colors cursor-pointer border ${
                           isActive
@@ -564,10 +569,11 @@ export default function MarketplacePage() {
                   トップに戻る
                 </button>
                 {searchMode === "consultation" && <ConsultationList
-                  key={`consultation-${selectedCategory}`}
+                  key={`consultation-${selectedCategory}-${consultationTab}`}
                   onNavigateToMentors={() => { setSearchMode("mentor"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   initialCategory={selectedCategory && !selectedCategory.startsWith("trend-") ? selectedCategory : null}
                   initialTrend={selectedCategory?.startsWith("trend-") ? trendCategories.find((t) => t.id === selectedCategory)?.label ?? null : null}
+                  initialTab={consultationTab}
                 />}
                 {searchMode === "topic" && <TopicList />}
                 {searchMode === "mentor" && <MentorList
@@ -593,7 +599,7 @@ export default function MarketplacePage() {
             <>
             {/* ① ピックアップメンター */}
             <section>
-              <SectionHeader icon={<StarIcon size={20} />} title="ピックアップメンター" moreHref="/1on1?tab=reserve" moreLabel="すべてのメンターを見る →" />
+              <SectionHeader icon={<StarIcon size={20} />} title="ピックアップメンター" moreLabel="すべてのメンターを見る →" onMoreClick={() => { setSearchMode("mentor"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
               <Carousel itemWidth={260}>
                 {pickupMentors.map((m) => (
                   <MentorCard key={m.name} {...m} />
@@ -603,7 +609,7 @@ export default function MarketplacePage() {
 
             {/* ② みんなの相談事例 */}
             <section>
-              <SectionHeader icon={<ChatIcon size={20} />} title="みんなの相談事例" moreHref="/1on1?tab=reserve" moreLabel="もっと見る →" />
+              <SectionHeader icon={<ChatIcon size={20} />} title="みんなの相談事例" moreLabel="もっと見る →" onMoreClick={() => { setConsultationTab("examples"); setSearchMode("consultation"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
               <Carousel itemWidth={320}>
                 {pastConsultations.map((c) => (
                   <PastConsultationCard key={c.id} consultation={c} />
@@ -613,7 +619,7 @@ export default function MarketplacePage() {
 
             {/* ③ 注目のトピック */}
             <section>
-              <SectionHeader icon={<ArticleIcon size={20} />} title="注目のトピック" moreHref="/1on1?tab=reserve" moreLabel="もっと見る →" />
+              <SectionHeader icon={<ArticleIcon size={20} />} title="注目のトピック" moreLabel="もっと見る →" onMoreClick={() => { setSearchMode("topic"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
               <Carousel itemWidth={220}>
                 {featuredTopics.map((t) => (
                   <TopicCard key={t.id} content={t} />

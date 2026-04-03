@@ -3,8 +3,20 @@
 import { useState } from "react";
 import MentorCard from "./MentorCard";
 
-const filterOptions = ["すべて", "Go", "React", "TypeScript", "Python", "AWS", "Java", "Ruby", "Docker", "Kubernetes"] as const;
-const sortOptions = ["おすすめ順", "初心者OK順", "English OK順"] as const;
+// ── 技術分野フィルター ──
+const techFieldFilters = [
+  { id: "HTML", label: "HTML" }, { id: "CSS", label: "CSS" },
+  { id: "JavaScript", label: "JavaScript" }, { id: "TypeScript", label: "TypeScript" },
+  { id: "React", label: "React" }, { id: "Next.js", label: "Next.js" },
+  { id: "Vue.js", label: "Vue.js" }, { id: "Node.js", label: "Node.js" },
+  { id: "Python", label: "Python" }, { id: "Go", label: "Go" },
+  { id: "Rust", label: "Rust" }, { id: "Swift", label: "Swift" },
+  { id: "Kotlin", label: "Kotlin" }, { id: "Flutter", label: "Flutter" },
+  { id: "AWS", label: "AWS" }, { id: "Docker", label: "Docker" },
+  { id: "Java", label: "Java" }, { id: "Ruby", label: "Ruby" },
+  { id: "Kubernetes", label: "Kubernetes" }, { id: "Terraform", label: "Terraform" },
+];
+
 
 export const mentors = [
   { name: "ちゅーやん", company: "フリーランス", level: "初心者OK" as const, englishOk: false, skills: ["Android", "iOS", "Flutter"], catchphrase: "Flutterのことなら何でも聞いてね！モバイル開発が大好きです", avatarUrl: "https://techbowl.s3-ap-northeast-1.amazonaws.com/techbowl/DzjceQsAg9HShbr1706187471.jpg_1.jpg", availability: "available" as const, recentTopics: ["アプリ設計", "UI実装"] },
@@ -64,130 +76,341 @@ export const mentors = [
   { name: "Shinjiro Echizen", company: "大手IT", level: "Rank3以上" as const, englishOk: false, skills: ["Java", "DDD", "マイクロサービス"], catchphrase: "設計って奥が深い。一緒に考えましょう", avatarUrl: "https://techbowl.s3.ap-northeast-1.amazonaws.com/mentor-profile-image/00fb156d5b52c2a08e7f8874bf0c6013.jpg", availability: "available" as const, recentTopics: ["DDD相談", "コードレビュー"] },
 ];
 
+// ── 所属タイプ ──
+const companyTypes = [
+  { id: "freelance", label: "フリーランス", match: (c: string) => c === "フリーランス" },
+  { id: "startup", label: "スタートアップ", match: (c: string) => c === "スタートアップ" },
+  { id: "mega", label: "メガベンチャー", match: (c: string) => c === "メガベンチャー" },
+  { id: "enterprise", label: "大手IT", match: (c: string) => c.includes("大手") },
+  { id: "foreign", label: "外資IT", match: (c: string) => c.includes("外資") },
+  { id: "web", label: "Web系", match: (c: string) => c.includes("Web") },
+];
+
+// ── 得意領域 ──
+const expertiseFilters = [
+  { id: "design", label: "設計全般", match: (topics: string[]) => topics.some(t => ["アプリ設計", "API設計", "DB設計", "設計レビュー", "システム設計", "DDD相談", "コンポ設計", "CSS設計", "設計相談"].includes(t)) },
+  { id: "infra", label: "インフラ/クラウド", match: (topics: string[]) => topics.some(t => ["インフラ構築", "クラウド構築", "IaC相談", "コスト最適化"].includes(t)) },
+  { id: "devops", label: "CI/CD・DevOps", match: (topics: string[]) => topics.some(t => ["CI/CD改善", "環境構築", "自動化相談", "監視設計"].includes(t)) },
+  { id: "ai", label: "AI/データ", match: (topics: string[]) => topics.some(t => ["AI活用相談", "モデル設計", "MLOps相談", "データ分析", "データ基盤", "統計相談", "SQL相談"].includes(t)) },
+  { id: "career", label: "キャリア相談", match: (topics: string[]) => topics.some(t => ["キャリア相談", "個人開発", "収益化相談"].includes(t)) },
+  { id: "security", label: "セキュリティ", match: (topics: string[]) => topics.some(t => ["脆弱性診断", "セキュリティ"].includes(t)) },
+  { id: "ui", label: "UI/UX", match: (topics: string[]) => topics.some(t => ["UI実装", "UX改善", "デザイン相談", "UI設計"].includes(t)) },
+  { id: "perf", label: "性能改善", match: (topics: string[]) => topics.some(t => ["性能改善", "障害対応", "運用改善"].includes(t)) },
+  { id: "team", label: "チーム運営", match: (topics: string[]) => topics.some(t => ["チーム運営", "コードレビュー"].includes(t)) },
+  { id: "release", label: "リリース相談", match: (topics: string[]) => topics.some(t => ["リリース相談", "技術選定"].includes(t)) },
+];
+
+// ── 空き状況 ──
+const availabilityFilters = [
+  { id: "available", label: "空いてる！" },
+  { id: "few", label: "まだいける" },
+];
+
 export default function MentorList({ initialFilter, initialLevel, onFilterChange }: { initialFilter?: string | null; initialLevel?: string | null; onFilterChange?: (filter: string) => void } = {}) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string>(initialFilter ?? "すべて");
-  const [activeSort, setActiveSort] = useState<string>(
-    initialLevel === "beginner" ? "初心者OK順" : initialLevel === "english" ? "English OK順" : "おすすめ順"
+  const [selectedTech, setSelectedTech] = useState<Set<string>>(
+    initialFilter && initialFilter !== "すべて" ? new Set([initialFilter]) : new Set()
   );
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(initialLevel ?? null);
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [selectedAvailability, setSelectedAvailability] = useState<string | null>(null);
+  const [selectedExpertise, setSelectedExpertise] = useState<Set<string>>(new Set());
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
-  const handleFilterChange = (filter: string) => {
-    setActiveFilter(filter);
-    onFilterChange?.(filter);
+  const DISPLAY_COUNT = 12;
+
+  const toggleTech = (id: string) => {
+    const next = new Set(selectedTech);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setSelectedTech(next);
+    onFilterChange?.(next.size === 1 ? [...next][0] : "すべて");
+  };
+
+  const toggleExpertise = (id: string) => {
+    const next = new Set(selectedExpertise);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setSelectedExpertise(next);
+  };
+
+  const hasActiveFilters = selectedTech.size > 0 || selectedLevel !== null || selectedCompany !== null || selectedAvailability !== null || selectedExpertise.size > 0;
+  const activeFilterCount = selectedTech.size + (selectedLevel ? 1 : 0) + (selectedCompany ? 1 : 0) + (selectedAvailability ? 1 : 0) + selectedExpertise.size;
+
+  const clearAll = () => {
+    setSelectedTech(new Set());
+    setSelectedLevel(null);
+    setSelectedCompany(null);
+    setSelectedAvailability(null);
+    setSelectedExpertise(new Set());
+    setShowAll(false);
+    onFilterChange?.("すべて");
   };
 
   const availabilityOrder = { available: 0, few: 1, full: 2 } as const;
 
-  const filtered = mentors
+  const allFiltered = mentors
     .filter((m) => {
-      const matchesSearch =
-        searchQuery === "" ||
-        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.skills.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesFilter =
-        activeFilter === "すべて" ||
-        m.skills.some((t) => t.toLowerCase() === activeFilter.toLowerCase());
-      const matchesLevel =
-        !initialLevel ||
-        (initialLevel === "beginner" && m.level === "初心者OK") ||
-        (initialLevel === "advanced" && m.level === "Rank3以上") ||
-        (initialLevel === "english" && m.englishOk);
-      return matchesSearch && matchesFilter && matchesLevel;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        if (
+          !m.name.toLowerCase().includes(q) &&
+          !m.skills.some((s) => s.toLowerCase().includes(q)) &&
+          !m.company.toLowerCase().includes(q) &&
+          !m.catchphrase.toLowerCase().includes(q) &&
+          !m.recentTopics.some((t) => t.toLowerCase().includes(q))
+        ) return false;
+      }
+      if (selectedTech.size > 0) {
+        if (!m.skills.some((s) => [...selectedTech].some((t) => s.toLowerCase().includes(t.toLowerCase())))) return false;
+      }
+      if (selectedLevel === "beginner" && m.level !== "初心者OK") return false;
+      if (selectedLevel === "advanced" && m.level !== "Rank3以上") return false;
+      if (selectedLevel === "english" && !m.englishOk) return false;
+      if (selectedCompany) {
+        const ct = companyTypes.find((c) => c.id === selectedCompany);
+        if (ct && !ct.match(m.company)) return false;
+      }
+      if (selectedAvailability) {
+        if (m.availability !== selectedAvailability) return false;
+      }
+      if (selectedExpertise.size > 0) {
+        const matchesAny = [...selectedExpertise].some((eId) => {
+          const ef = expertiseFilters.find((e) => e.id === eId);
+          return ef?.match(m.recentTopics);
+        });
+        if (!matchesAny) return false;
+      }
+      return true;
     })
     .sort((a, b) => availabilityOrder[a.availability] - availabilityOrder[b.availability]);
 
+  const displayMentors = showAll ? allFiltered : allFiltered.slice(0, DISPLAY_COUNT);
+
   return (
     <div>
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="メンターを検索"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full px-4 py-2.5 text-sm text-text-body placeholder-text-secondary bg-white border border-border-primary rounded-lg focus:outline-none focus:border-brand-primary mb-4"
-      />
-
-      {/* Filter & Sort Dropdowns */}
-      <div className="flex items-center gap-3 mb-6">
-        {/* 絞り込む */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => { setFilterOpen(!filterOpen); setSortOpen(false); }}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-text-body border border-border-secondary rounded-full hover:bg-bg-quaternary transition-colors cursor-pointer"
-          >
-            絞り込む
-            <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 16L6 10H18L12 16Z" />
-            </svg>
-          </button>
-          {filterOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setFilterOpen(false)} />
-              <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-border-secondary rounded-xl shadow-lg py-1 min-w-[160px]">
-                {filterOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => { handleFilterChange(opt); setFilterOpen(false); }}
-                    className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
-                      activeFilter === opt
-                        ? "text-brand-primary font-bold bg-bg-quaternary"
-                        : "text-text-body hover:bg-bg-quaternary"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            </>
+      {/* ── 検索 + 絞り込みトグル ── */}
+      <div className="flex items-center gap-2 mb-3">
+        <input
+          type="text"
+          placeholder="メンター名・スキル・会社で検索"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 min-w-0 px-4 py-2 text-sm text-text-body placeholder-text-secondary bg-white border border-border-primary rounded-lg focus:outline-none focus:border-brand-primary"
+        />
+        <button
+          type="button"
+          onClick={() => setIsDetailOpen(!isDetailOpen)}
+          className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer border ${
+            isDetailOpen
+              ? "bg-brand-primary text-white border-brand-primary"
+              : hasActiveFilters
+              ? "bg-brand-primary/5 text-brand-primary border-brand-primary"
+              : "bg-white text-text-body border-border-primary hover:border-brand-primary hover:text-brand-primary"
+          }`}
+        >
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 4V6H20L15 13.5V22H9V13.5L4 6H3V4H21ZM6.404 6L11 12.894V20H13V12.894L17.596 6H6.404Z" />
+          </svg>
+          絞り込む
+          {activeFilterCount > 0 && (
+            <span className="text-[10px] font-bold text-white bg-brand-primary w-5 h-5 rounded-full flex items-center justify-center">
+              {activeFilterCount}
+            </span>
           )}
-        </div>
+          <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+            className={`transition-transform duration-200 ${isDetailOpen ? "rotate-180" : ""}`}>
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+      </div>
 
-        {/* おすすめ順 */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => { setSortOpen(!sortOpen); setFilterOpen(false); }}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-text-body border border-border-secondary rounded-full hover:bg-bg-quaternary transition-colors cursor-pointer"
-          >
-            {activeSort}
-            <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 16L6 10H18L12 16Z" />
-            </svg>
+      {/* ── 選択中のフィルター（閉じた状態でも表示） ── */}
+      {!isDetailOpen && hasActiveFilters && (
+        <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+          {[...selectedTech].map((t) => (
+            <button key={t} type="button" onClick={() => toggleTech(t)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-brand-primary text-white cursor-pointer">
+              {t}
+              <svg width={10} height={10} viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586L6.707 5.293 5.293 6.707 10.586 12 5.293 17.293 6.707 18.707 12 13.414 17.293 18.707 18.707 17.293 13.414 12 18.707 6.707 17.293 5.293 12 10.586Z" /></svg>
+            </button>
+          ))}
+          {selectedLevel && (
+            <button type="button" onClick={() => setSelectedLevel(null)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-brand-primary text-white cursor-pointer">
+              {{ beginner: "初心者OK", advanced: "Rank3以上", english: "English OK" }[selectedLevel]}
+              <svg width={10} height={10} viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586L6.707 5.293 5.293 6.707 10.586 12 5.293 17.293 6.707 18.707 12 13.414 17.293 18.707 18.707 17.293 13.414 12 18.707 6.707 17.293 5.293 12 10.586Z" /></svg>
+            </button>
+          )}
+          {selectedAvailability && (
+            <button type="button" onClick={() => setSelectedAvailability(null)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-600 text-white cursor-pointer">
+              {availabilityFilters.find((a) => a.id === selectedAvailability)?.label}
+              <svg width={10} height={10} viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586L6.707 5.293 5.293 6.707 10.586 12 5.293 17.293 6.707 18.707 12 13.414 17.293 18.707 18.707 17.293 13.414 12 18.707 6.707 17.293 5.293 12 10.586Z" /></svg>
+            </button>
+          )}
+          {selectedCompany && (
+            <button type="button" onClick={() => setSelectedCompany(null)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-brand-primary text-white cursor-pointer">
+              {companyTypes.find((c) => c.id === selectedCompany)?.label}
+              <svg width={10} height={10} viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586L6.707 5.293 5.293 6.707 10.586 12 5.293 17.293 6.707 18.707 12 13.414 17.293 18.707 18.707 17.293 13.414 12 18.707 6.707 17.293 5.293 12 10.586Z" /></svg>
+            </button>
+          )}
+          {[...selectedExpertise].map((eId) => (
+            <button key={eId} type="button" onClick={() => toggleExpertise(eId)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-violet-600 text-white cursor-pointer">
+              {expertiseFilters.find((e) => e.id === eId)?.label}
+              <svg width={10} height={10} viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586L6.707 5.293 5.293 6.707 10.586 12 5.293 17.293 6.707 18.707 12 13.414 17.293 18.707 18.707 17.293 13.414 12 18.707 6.707 17.293 5.293 12 10.586Z" /></svg>
+            </button>
+          ))}
+          <button type="button" onClick={clearAll} className="text-[11px] text-text-description hover:text-brand-primary cursor-pointer ml-1">
+            すべて解除
           </button>
-          {sortOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setSortOpen(false)} />
-              <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-border-secondary rounded-xl shadow-lg py-1 min-w-[160px]">
-                {sortOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => { setActiveSort(opt); setSortOpen(false); }}
-                    className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
-                      activeSort === opt
-                        ? "text-brand-primary font-bold bg-bg-quaternary"
-                        : "text-text-body hover:bg-bg-quaternary"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            </>
+        </div>
+      )}
+
+      {/* ── フィルターパネル（折りたたみ） ── */}
+      <div className={`transition-all duration-200 ease-in-out overflow-hidden ${isDetailOpen ? "max-h-[800px] opacity-100 mb-4" : "max-h-0 opacity-0"}`}>
+        <div className="bg-white border border-border-primary rounded-xl p-4 space-y-3">
+          {/* 技術スキル */}
+          <div>
+            <h4 className="text-[11px] font-bold text-text-description mb-2">技術スキル</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {techFieldFilters.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => toggleTech(f.id)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] transition-all cursor-pointer border ${
+                    selectedTech.has(f.id)
+                      ? "bg-brand-primary text-white border-brand-primary font-bold"
+                      : "bg-white text-text-body border-border-primary hover:border-brand-primary hover:text-brand-primary"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* 得意領域 */}
+          <div>
+            <h4 className="text-[11px] font-bold text-text-description mb-2">得意領域</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {expertiseFilters.map((ef) => (
+                <button
+                  key={ef.id}
+                  type="button"
+                  onClick={() => toggleExpertise(ef.id)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] transition-all cursor-pointer border ${
+                    selectedExpertise.has(ef.id)
+                      ? "bg-violet-600 text-white border-violet-600 font-bold"
+                      : "bg-white text-text-body border-border-primary hover:border-violet-400 hover:text-violet-600"
+                  }`}
+                >
+                  {ef.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* レベル */}
+          <div>
+            <h4 className="text-[11px] font-bold text-text-description mb-2">レベル</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { id: "beginner", label: "初心者OK" },
+                { id: "advanced", label: "Rank3以上" },
+                { id: "english", label: "English OK" },
+              ].map((lv) => (
+                <button
+                  key={lv.id}
+                  type="button"
+                  onClick={() => setSelectedLevel(selectedLevel === lv.id ? null : lv.id)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] transition-all cursor-pointer border ${
+                    selectedLevel === lv.id
+                      ? "bg-brand-primary text-white border-brand-primary font-bold"
+                      : "bg-white text-text-body border-border-primary hover:border-brand-primary hover:text-brand-primary"
+                  }`}
+                >
+                  {lv.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* 空き状況 */}
+          <div>
+            <h4 className="text-[11px] font-bold text-text-description mb-2">空き状況</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {availabilityFilters.map((av) => (
+                <button
+                  key={av.id}
+                  type="button"
+                  onClick={() => setSelectedAvailability(selectedAvailability === av.id ? null : av.id)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] transition-all cursor-pointer border ${
+                    selectedAvailability === av.id
+                      ? "bg-green-600 text-white border-green-600 font-bold"
+                      : "bg-white text-text-body border-border-primary hover:border-green-500 hover:text-green-600"
+                  }`}
+                >
+                  {av.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* 所属タイプ */}
+          <div>
+            <h4 className="text-[11px] font-bold text-text-description mb-2">所属タイプ</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {companyTypes.map((ct) => (
+                <button
+                  key={ct.id}
+                  type="button"
+                  onClick={() => setSelectedCompany(selectedCompany === ct.id ? null : ct.id)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] transition-all cursor-pointer border ${
+                    selectedCompany === ct.id
+                      ? "bg-brand-primary text-white border-brand-primary font-bold"
+                      : "bg-white text-text-body border-border-primary hover:border-brand-primary hover:text-brand-primary"
+                  }`}
+                >
+                  {ct.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* リセット */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between pt-2 border-t border-border-primary">
+              <span className="text-xs text-text-body"><span className="font-bold text-brand-primary">{allFiltered.length}名</span> が該当</span>
+              <button type="button" onClick={clearAll} className="text-xs text-text-description hover:text-brand-primary cursor-pointer">条件をリセット</button>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Mentor Grid */}
+      {/* ── メンター一覧 ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        {filtered.map((mentor) => (
+        {displayMentors.map((mentor) => (
           <MentorCard key={mentor.name} {...mentor} />
         ))}
       </div>
+      {displayMentors.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-text-description text-sm">条件に合うメンターが見つかりませんでした</p>
+          <button type="button" onClick={clearAll} className="mt-2 text-sm text-brand-primary hover:underline cursor-pointer">条件をリセットする</button>
+        </div>
+      )}
+      {!showAll && allFiltered.length > DISPLAY_COUNT && (
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-primary hover:underline cursor-pointer"
+          >
+            <span>もっと見る（他{allFiltered.length - DISPLAY_COUNT}名）</span>
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="mt-px">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
